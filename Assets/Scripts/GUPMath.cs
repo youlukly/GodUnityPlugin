@@ -6,9 +6,27 @@ namespace GodUnityPlugin
 {
     public static class GUPMath
     {
-        public static float PercentToValue(float value, float reference)
+        public static float Quotient(float dividend, float divisor)
         {
-            return (reference * (value / 100f));
+            float remainder = dividend % divisor;
+
+            float multiple = dividend - remainder;
+
+            return multiple / divisor;
+        }
+
+        public static int Quotient(int dividend, int divisor)
+        {
+            int remainder = dividend % divisor;
+
+            int multiple = dividend - remainder;
+
+            return multiple / divisor;
+        }
+
+        public static float PercentToValue(float percent, float reference)
+        {
+            return (reference * (percent / 100f));
         }
 
         public static float PercentToValue(int value, int reference)
@@ -21,9 +39,9 @@ namespace GodUnityPlugin
             return 100f * value / reference;
         }
 
-        public static float ValueToPercent(int value, int reference)
+        public static float ValueToPercent(int percent, int reference)
         {
-            return 100f * value / reference;
+            return 100f * percent / reference;
         }
 
         public static float Least(float[] values)
