@@ -10,26 +10,10 @@ namespace GodUnityPlugin
 
         private BoxCollider2D gridBox;
 
-        public Grid Grid
+        public void Init(Grid grid)
         {
-            get
-            {
-                if (grid == null)
-                    grid = GetComponent<Grid>();
-
-                return grid;
-            }
-        }
-
-        public BoxCollider2D GridBox
-        {
-            get
-            {
-                if (gridBox == null)
-                    CreateBox();
-
-                return gridBox;
-            }
+            this.grid = grid;
+            CreateBox();
         }
 
         private void CreateBox()
@@ -54,7 +38,7 @@ namespace GodUnityPlugin
 
         private void UpdateSceneView(SceneView sceneView)
         {
-            if (Grid == null || gridBox == null)
+            if (grid == null || gridBox == null)
                 return;
 
             if (Event.current.type != EventType.MouseDown || Event.current.button != 0)
@@ -68,17 +52,17 @@ namespace GodUnityPlugin
 
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider != GridBox)
+                if (hit.collider != gridBox)
                     return;
 
-                if (Grid.cells == null)
+                if (grid.cells == null)
                     return;
 
-                for (int i = 0; i < Grid.cells.Length; i++)
+                for (int i = 0; i < grid.cells.Length; i++)
                 {
-                    for (int j = 0; j < Grid.cells[i].Length; j++)
+                    for (int j = 0; j < grid.cells[i].Length; j++)
                     {
-                        if (Grid.cells[i][j].Contains(hit.point))
+                        if (grid.cells[i][j].Contains(hit.point))
                         {
                             Debug.Log("select cell : [" + i + "], [" + j + "]");
                             return;
@@ -91,7 +75,7 @@ namespace GodUnityPlugin
 
         private void Update()
         {
-            if (Grid == null || GridBox == null)
+            if (grid == null || gridBox == null)
                 return;
 
             if (Input.GetKeyDown(KeyCode.Mouse0))
@@ -104,17 +88,17 @@ namespace GodUnityPlugin
 
                 if (Physics.Raycast(ray, out hit))
                 {
-                    if (hit.collider != GridBox)
+                    if (hit.collider != gridBox)
                         return;
 
-                    if (Grid.cells == null)
+                    if (grid.cells == null)
                         return;
 
-                    for (int i = 0; i < Grid.cells.Length; i++)
+                    for (int i = 0; i < grid.cells.Length; i++)
                     {
-                        for (int j = 0; j < Grid.cells[i].Length; j++)
+                        for (int j = 0; j < grid.cells[i].Length; j++)
                         {
-                            if (Grid.cells[i][j].Contains(hit.point))
+                            if (grid.cells[i][j].Contains(hit.point))
                             {
                                 Debug.Log("select cell : [" + i + "], [" + j + "]");
                                 return;

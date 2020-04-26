@@ -13,6 +13,9 @@ namespace GodUnityPlugin
             Grid grid = target as Grid;
             if (GUILayout.Button("Generate Cell"))
                 grid.CreateCellMatrix();
+
+            if (GUILayout.Button("Attach Selector"))
+                grid.CreateCellMatrix();
         }
 
         //// draw the grid :) 
