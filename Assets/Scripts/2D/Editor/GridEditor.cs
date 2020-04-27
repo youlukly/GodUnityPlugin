@@ -11,10 +11,8 @@ namespace GodUnityPlugin
             DrawDefaultInspector();
 
             Grid grid = target as Grid;
-            if (GUILayout.Button("Generate Cell"))
-                grid.CreateCellMatrix();
 
-            if (GUILayout.Button("Attach Selector"))
+            if (GUILayout.Button("Generate Cell"))
                 grid.CreateCellMatrix();
         }
 
