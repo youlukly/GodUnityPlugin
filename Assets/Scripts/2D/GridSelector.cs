@@ -8,9 +8,9 @@ namespace GodUnityPlugin
     {
         private Grid grid;
 
-        private BoxCollider2D gridBox;
+        private BoxCollider gridBox;
 
-        public Grid Grid
+        private Grid Grid
         {
             get
             {
@@ -21,79 +21,84 @@ namespace GodUnityPlugin
             }
         }
 
-        public BoxCollider2D GridBox
+        private BoxCollider GridBox
         {
             get
             {
+                gridBox = GetComponent<BoxCollider>();
+
                 if (gridBox == null)
-                    CreateBox();
+                    gridBox = grid.gameObject.AddComponent<BoxCollider>();
 
                 return gridBox;
             }
         }
 
-        private void CreateBox()
+        private void Awake()
         {
-            gridBox = grid.gameObject.AddComponent<BoxCollider2D>();
-
-            float gridWidth = grid.cellWidth * grid.AbsCellCountX;
-            float gridHeight = grid.cellHeight * grid.AbsCellCountY;
-
-            gridBox.size = new Vector2(gridWidth,gridHeight);
+            SynchronizeCollider();
         }
 
-        private void OnEnable()
+        public void SynchronizeCollider()
         {
-            SceneView.duringSceneGui += UpdateSceneView;
+            Bounds bounds = new Bounds(Grid.center, new Vector2(Grid.Width, Grid.Height));
+
+            GridBox.size = bounds.size;
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
-            SceneView.duringSceneGui -= UpdateSceneView;
+            DestroyBox();
         }
 
-        private void UpdateSceneView(SceneView sceneView)
+        private void DestroyBox()
         {
-            if (Grid == null || gridBox == null)
-                return;
-
-            if (Event.current.type != EventType.MouseDown || Event.current.button != 0)
-                return;
-
-            Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-
-            Debug.DrawRay(ray.origin,ray.direction * 999f, Color.red,2.0f);
-
-            RaycastHit hit = new RaycastHit();
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                if (hit.collider != GridBox)
-                    return;
-
-                if (Grid.cells == null)
-                    return;
-
-                for (int i = 0; i < Grid.cells.Length; i++)
-                {
-                    for (int j = 0; j < Grid.cells[i].Length; j++)
-                    {
-                        if (Grid.cells[i][j].Contains(hit.point))
-                        {
-                            Debug.Log("select cell : [" + i + "], [" + j + "]");
-                            return;
-                        }
-                    }
-                }
-            }
-
+            if (gridBox != null)
+                if (Application.isPlaying)
+                    Destroy(gridBox);
+                else
+                    DestroyImmediate(gridBox);
         }
+
+        //private void UpdateSceneView(SceneView sceneView)
+        //{
+        //    if (grid == null || gridBox == null)
+        //        return;
+
+        //    if (Event.current.type != EventType.MouseDown || Event.current.button != 0)
+        //        return;
+
+        //    Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+
+        //    Debug.DrawRay(ray.origin, ray.direction * 999f, Color.red, 2.0f);
+
+        //    RaycastHit hit = new RaycastHit();
+
+        //    if (Physics.Raycast(ray, out hit))
+        //    {
+        //        if (hit.collider != gridBox)
+        //            return;
+
+        //        if (grid.cells == null)
+        //            return;
+
+        //        for (int i = 0; i < grid.cells.Length; i++)
+        //        {
+        //            for (int j = 0; j < grid.cells[i].Length; j++)
+        //            {
+        //                if (grid.cells[i][j].Contains(hit.point))
+        //                {
+        //                    Debug.Log("select cell : [" + i + "], [" + j + "]");
+        //                    return;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //}
 
         private void Update()
         {
-            if (Grid == null || GridBox == null)
-                return;
-
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -126,6 +131,11 @@ namespace GodUnityPlugin
 
             }
 
+        }
+
+        private void OnDrawGizmos()
+        {
+           
         }
     }
 }
