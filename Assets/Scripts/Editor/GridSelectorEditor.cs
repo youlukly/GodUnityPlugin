@@ -12,8 +12,8 @@ namespace GodUnityPlugin
 
             GridSelector selector = target as GridSelector;
 
-            if (GUILayout.Button("Synchronize Grid Size"))
-                selector.SynchronizeCollider();
+            if (GUILayout.Button("Update SceneView"))
+                selector.StartSceneViewUpdate();
         }
     }
 }
