@@ -1,19 +1,16 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿//using UnityEngine;
+//using UnityEditor;
 
-namespace GodUnityPlugin
-{
-    [CustomEditor(typeof(GridSelector))]
-    public class GridSelectorEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            DrawDefaultInspector();
+//namespace GodUnityPlugin
+//{
+//    [CustomEditor(typeof(GridSelector))]
+//    public class GridSelectorEditor : Editor
+//    {
+//        private void OnSceneGUI()
+//        {
+//            GridSelector selector = target as GridSelector;
 
-            GridSelector selector = target as GridSelector;
-
-            if (GUILayout.Button("Update SceneView"))
-                selector.StartSceneViewUpdate();
-        }
-    }
-}
+//            selector.UpdateSceneView();
+//        }
+//    }
+//}
