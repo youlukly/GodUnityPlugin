@@ -7,16 +7,16 @@ namespace GodUnityPlugin
         [Header("Grid")]
         // universal grid scale
         [SerializeField] private float gridScale = 1f;
-        // count of grid array
+        // count of the grid array
         [SerializeField] private int row = 5;
         [SerializeField] private int column = 5;
         [SerializeField] private Vector3 gridOffset = Vector3.zero;
-        // force cell data update
-        public bool forceUpdateCell = true;
+        // whether update cell data automatically or not
+        public bool autoCellUpdate = true;
 
         [Space(10)]
         [Header("GridCell")]
-        // size of cell
+        // size of the cell
         [SerializeField] private float cellWidth = 5f;
         [SerializeField] private float cellHeight = 5f;
         public string cellName = "Cell";
@@ -27,12 +27,12 @@ namespace GodUnityPlugin
         public Color gizmoLineColor = new Color(0.25f, 0.1f, 0.25f, 1f);
         public Color gizmoCellColor = new Color(0.2f, 0.6f, 0.45f, 0.8f);
 
-        // array of grid cells
+        // array of the grid cells
         public GridCell[][] CellArray
         {
             get
             {
-                if (forceUpdateCell)
+                if (autoCellUpdate)
                     UpdateCellMatrix();
 
                 if (cellArray == null)
@@ -42,14 +42,19 @@ namespace GodUnityPlugin
             }
         }
 
-        // total width of grid
+        // total width of the grid
         public float Width { get { return AbsCellWidth * Row * gridScale; } }
 
-        // total height of grid
+        // total height of the grid
         public float Height { get { return AbsCellHeight * Column * gridScale; } }
 
-        // center of grid
+        // center of the grid
         public Vector3 center { get { return ( Quaternion.Inverse(quaternionEuler) * transform.position) + gridOffset; } }
+
+        // normal of the grid
+        public Vector3 normal { get { return GetNormal(); } }
+
+        public Vector3[] vertices { get { return GetVertices(); } }
 
         // row value that returns natural number always
         public int Row
@@ -75,7 +80,7 @@ namespace GodUnityPlugin
             }
         }
 
-        // euler angle of grid gameObject
+        // euler quaternion of grid gameObject
         public Quaternion quaternionEuler { get { return Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z); } }
 
         // absolute number of cell width
@@ -155,11 +160,11 @@ namespace GodUnityPlugin
 
                     string name = cellName + " " + index;
 
-                    cellArray[i][j] = new GridCell(name, cellCenter,quaternionEuler.eulerAngles, AbsCellWidth, AbsCellHeight, j, i);
+                    cellArray[i][j] = new GridCell(name, cellCenter,quaternionEuler.eulerAngles,normal, AbsCellWidth, AbsCellHeight, j, i);
                 }
             }
         }
-
+      
         // returns vertices of the cell. always returns 4 values with matrix order
         public Vector3[] GetCellVertices(GridCell cell)
         {
@@ -171,14 +176,50 @@ namespace GodUnityPlugin
             float yMax = cellCenter.y + (cell.height / 2.0f);
 
             Vector3 a = quaternionEuler * new Vector3(xMin, yMax);
-
             Vector3 b = quaternionEuler * new Vector3(xMax, yMax);
-
             Vector3 c = quaternionEuler * new Vector3(xMin, yMin);
-
             Vector3 d = quaternionEuler * new Vector3(xMax, yMin);
 
             Vector3[] vertices = new Vector3[] { a,b,c,d };
+
+            return vertices;
+        }
+
+        // returns normal of the grid.
+        private Vector3 GetNormal()
+        {
+            Vector3 normal = Vector3.zero;
+
+            Vector3[] vert = vertices;
+
+            Vector3 a = vert[0];
+            Vector3 b = vert[1];
+            Vector3 c = vert[2];
+
+            Vector3 side1 = b - a;
+            Vector3 side2 = c - a;
+
+            Vector3 perp = Vector3.Cross(side1,side2);
+
+            return  perp.normalized;
+        }
+
+        // returns vertices of the grid. always returns 4 values with matrix order
+        private Vector3[] GetVertices()
+        {
+            Vector3 centerRaw = transform.position + gridOffset;
+
+            float xMin = centerRaw.x - (Width / 2.0f);
+            float xMax = centerRaw.x + (Width / 2.0f);
+            float yMin = centerRaw.y - (Height / 2.0f);
+            float yMax = centerRaw.y + (Height / 2.0f);
+
+            Vector3 a = quaternionEuler * new Vector3(xMin, yMax);
+            Vector3 b = quaternionEuler * new Vector3(xMax, yMax);
+            Vector3 c = quaternionEuler * new Vector3(xMin, yMin);
+            Vector3 d = quaternionEuler * new Vector3(xMax, yMin);
+
+            Vector3[] vertices = new Vector3[] { a, b, c, d };
 
             return vertices;
         }
@@ -193,7 +234,6 @@ namespace GodUnityPlugin
             Vector3 c = vertices[2];
 
             Vector3 xVector = a - b;
-
             Vector3 yVector = a - c;
 
             Vector3 pointVector = a - point;
@@ -283,6 +323,16 @@ namespace GodUnityPlugin
 
                 Gizmos.DrawLine((gridOffset + pos1), (gridOffset + pos2));
             }
+
+            float range = AbsCellWidth + AbsCellHeight;
+
+            range = range / 2.0f;
+
+            Vector3 dir = normal * range;
+
+            Gizmos.color = Color.Lerp(Color.black, gizmoLineColor, 0.4f);
+
+            Gizmos.DrawLine(center,center+dir);
         }
 #endif
 

@@ -69,24 +69,20 @@ namespace GodUnityPlugin
 
         private void CheckGridCell(Ray ray)
         {
-            RaycastHit hit = new RaycastHit();
+            RaycastHit[] hits = Physics.RaycastAll(ray);
 
-            if (Physics.Raycast(ray, out hit))
+            foreach (RaycastHit hit in hits)
             {
-                if (hit.collider == null || hit.collider != gridBox)
+                if (hit.collider != null && hit.collider == gridBox)
                 {
-                    OnDeselect();
-                    return;
+                    GridCell cell = new GridCell();
+
+                    if (grid.IsInCell(hit.point, out cell))
+                    {
+                        OnSelect(cell);
+                        return;
+                    }
                 }
-
-                GridCell cell = new GridCell();
-
-                if (grid.IsInCell(hit.point,out cell) )
-                {
-                    OnSelect(cell);
-                    return;
-                }
-
             }
 
             OnDeselect();

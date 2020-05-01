@@ -12,8 +12,8 @@ namespace GodUnityPlugin
 
             Grid grid = target as Grid;
 
-            if(!grid.forceUpdateCell)
-            if (GUILayout.Button("Update Cell Matrix"))
+            if(!grid.autoCellUpdate)
+            if (GUILayout.Button("Update Cell Matrix Manually"))
                 grid.UpdateCellMatrix();
         }
 
