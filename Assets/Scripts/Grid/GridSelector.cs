@@ -16,7 +16,7 @@ namespace GodUnityPlugin
         // grid cell unity events, respond with user input
         [Header("Events")]
         public GridCellUnityEvent onDown;
-        public GridCellUnityEvent onDrag;
+        public Vector3UnityEvent onDrag;
         public GridCellUnityEvent onUp;
         public GridCellUnityEvent onOver;
 
@@ -60,6 +60,7 @@ namespace GodUnityPlugin
                 return;
 
             GridCell selected;
+            Vector3 point;
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -68,8 +69,8 @@ namespace GodUnityPlugin
             }
             else if (Input.GetMouseButton(0))
             {
-                if (CheckGridCell(out selected))
-                    onDrag.Invoke(selected);
+                if (CheckGridCell(out point))
+                    onDrag.Invoke(point);
             }
             else if (Input.GetMouseButtonUp(0))
             {
@@ -97,6 +98,26 @@ namespace GodUnityPlugin
                 {
                     if (grid.IsInCell(hit.point, out cell))
                         return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool CheckGridCell(out Vector3 point)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            point = new Vector3();
+
+            RaycastHit[] hits = Physics.RaycastAll(ray);
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.collider != null && hit.collider == gridBox)
+                {
+                    point = hit.point;
+                    return true;
                 }
             }
 

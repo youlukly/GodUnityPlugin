@@ -11,8 +11,6 @@ namespace GodUnityPlugin
         [SerializeField] private int row = 5;
         [SerializeField] private int column = 5;
         [SerializeField] private Vector3 gridOffset = Vector3.zero;
-        // whether update cell data automatically or not
-        public bool autoCellUpdate = true;
 
         [Space(10)]
         [Header("GridCell")]
@@ -28,19 +26,7 @@ namespace GodUnityPlugin
         public Color gizmoCellColor = new Color(0.2f, 0.6f, 0.45f, 0.8f);
 
         // array of the grid cells
-        public GridCell[][] CellArray
-        {
-            get
-            {
-                if (autoCellUpdate)
-                    UpdateCellMatrix();
-
-                if (cellArray == null)
-                    InitializeArray();
-
-                return cellArray;
-            }
-        }
+        public GridCell[][] CellArray { get; private set; }
 
         // total width of the grid
         public float Width { get { return AbsCellWidth * Row * gridScale; } }
@@ -101,8 +87,6 @@ namespace GodUnityPlugin
         // maximum y-axis value of grid
         private float yOffsetMax { get { return -yOffsetMin; } }
   
-        private GridCell[][] cellArray;
-
         // returns the cell that matches the ID
         public GridCell Get(string id)
         {
@@ -118,6 +102,11 @@ namespace GodUnityPlugin
             }
 
             return new GridCell();
+        }
+
+        private void Awake()
+        {
+            UpdateCellMatrix();
         }
 
         // check if a vector is in grid matrix
@@ -160,20 +149,32 @@ namespace GodUnityPlugin
 
                     string name = cellName + " " + index;
 
-                    cellArray[i][j] = new GridCell(name, cellCenter,quaternionEuler.eulerAngles,normal, AbsCellWidth, AbsCellHeight, j, i);
+                    CellArray[i][j] = new GridCell(name, cellCenter,normal,GetCellVertices(i,j, AbsCellWidth,AbsCellHeight), AbsCellWidth, AbsCellHeight, j, i);
                 }
             }
         }
-      
-        // returns vertices of the cell. always returns 4 values with matrix order
-        public Vector3[] GetCellVertices(GridCell cell)
-        {
-            Vector3 cellCenter = GetCellCenterRaw(cell.columnIndex, cell.rowIndex);
 
-            float xMin = cellCenter.x - (cell.width / 2.0f);
-            float xMax = cellCenter.x + (cell.width / 2.0f);
-            float yMin = cellCenter.y - (cell.height / 2.0f);
-            float yMax = cellCenter.y + (cell.height / 2.0f);
+        // compare two cell values
+        public bool Equals(GridCell x, GridCell y)
+        {
+            return x.center == y.center &&
+            x.columnIndex == y.columnIndex &&
+            x.rowIndex == y.rowIndex &&
+            x.height == y.height &&
+            x.width == y.width &&
+            x.id == y.id &&
+            x.normal == y.normal;
+        }
+
+        // returns vertices of the cell. always returns 4 values with matrix order
+        private Vector3[] GetCellVertices(int columnIndex,int rowIndex,float width,float height)
+        {
+            Vector3 cellCenter = GetCellCenterRaw(columnIndex, rowIndex);
+
+            float xMin = cellCenter.x - (width / 2.0f);
+            float xMax = cellCenter.x + (width / 2.0f);
+            float yMin = cellCenter.y - (height / 2.0f);
+            float yMax = cellCenter.y + (height / 2.0f);
 
             Vector3 a = quaternionEuler * new Vector3(xMin, yMax);
             Vector3 b = quaternionEuler * new Vector3(xMax, yMax);
@@ -227,7 +228,7 @@ namespace GodUnityPlugin
         // check if a vector is in cell element
         private bool IsInCell(Vector3 point,GridCell cell)
         {
-            Vector3[] vertices = GetCellVertices(cell);
+            Vector3[] vertices = GetCellVertices(cell.columnIndex,cell.rowIndex,cell.width,cell.height);
 
             Vector3 a = vertices[0];
             Vector3 b = vertices[1];
@@ -273,9 +274,9 @@ namespace GodUnityPlugin
         // initialize cell array
         private void InitializeArray()
         {
-            cellArray = new GridCell[Column][];
-            for (int i = 0; i < cellArray.Length; i++)
-                cellArray[i] = new GridCell[Row];
+            CellArray = new GridCell[Column][];
+            for (int i = 0; i < CellArray.Length; i++)
+                CellArray[i] = new GridCell[Row];
         }
 
 #if UNITY_EDITOR
