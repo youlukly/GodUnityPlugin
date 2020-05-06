@@ -70,10 +70,10 @@ namespace GodUnityPlugin
         public Quaternion quaternionEuler { get { return Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z); } }
 
         // absolute number of cell width
-        private float AbsCellWidth { get { return Mathf.Abs(cellWidth); } }
+        public float AbsCellWidth { get { return Mathf.Abs(cellWidth); } }
 
         // absolute number of cell height
-        private float AbsCellHeight { get { return Mathf.Abs(cellHeight); } }
+        public float AbsCellHeight { get { return Mathf.Abs(cellHeight); } }
 
         // minimal x-axis value of grid
         private float xOffsetMin { get { return -(Width / 2.0f); } }
