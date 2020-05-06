@@ -10,8 +10,6 @@ namespace GodUnityPlugin
         public bool allowInput = true;
         public bool autoSynchronize = false;
 
-        public float edgeBuffer = 3.0f;
-
         // grid cell unity events, respond with user input
         [Header("Events")]
         public GridCellUnityEvent onDownCell;
