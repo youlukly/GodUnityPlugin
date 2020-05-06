@@ -233,19 +233,9 @@ namespace GodUnityPlugin
             Vector3 a = vertices[0];
             Vector3 b = vertices[1];
             Vector3 c = vertices[2];
+            Vector3 d = vertices[3];
 
-            Vector3 xVector = a - b;
-            Vector3 yVector = a - c;
-
-            Vector3 pointVector = a - point;
-
-            float xMag = Vector3.Project(pointVector, xVector).magnitude;
-            float yMag = Vector3.Project(pointVector, yVector).magnitude;
-
-            if (xMag < 0.0f || xMag > cell.width || yMag < 0.0f || yMag > cell.height)
-                return false;
-
-            return true;
+            return GUPMath.IsVertexInRectangle(a,b,c,d,point);
         }
 
         // uncalibrated center of the cell 

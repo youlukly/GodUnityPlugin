@@ -373,6 +373,11 @@ namespace GodUnityPlugin
             return result;
         }
 
+        public static bool IsVertexInRectangle(Vector3 a, Vector3 b, Vector3 c, Vector3 d,Vector3 point)
+        {
+            return IsVertexInTriangle(a, b, c, point) || IsVertexInTriangle(d, c, b, point);
+        }
+
         public static bool IsVertexInTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 point)
         {
             return IsInAcuteAngle(a, b, c, point) &&
