@@ -45,7 +45,11 @@ namespace GodUnityPlugin
 
             gridBox = GetComponent<BoxCollider>();
             if (gridBox == null)
+            {
                 gridBox = gameObject.AddComponent<BoxCollider>();
+                gridBox.isTrigger = true;
+                SynchronizeCollider();
+            }
         }
 
         private void Update()

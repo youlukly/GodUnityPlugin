@@ -23,7 +23,6 @@ namespace GodUnityPlugin
         [Header("Gizmos")]
         [SerializeField] private bool drawGizmos = true;
         public Color gizmoLineColor = new Color(0.25f, 0.1f, 0.25f, 1f);
-        public Color gizmoCellColor = new Color(0.2f, 0.6f, 0.45f, 0.8f);
 
         // array of the grid cells
         public GridCell[][] CellArray { get; private set; }
