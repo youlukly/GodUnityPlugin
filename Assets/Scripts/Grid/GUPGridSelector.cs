@@ -4,8 +4,8 @@ using UnityEditor;
 
 namespace GodUnityPlugin
 {
-    [RequireComponent(typeof(Grid))]
-    public class GridSelector : MonoBehaviour
+    [RequireComponent(typeof(GUPGrid))]
+    public class GUPGridSelector : MonoBehaviour
     {
         public bool allowInput = true;
         public bool autoSynchronize = false;
@@ -29,7 +29,7 @@ namespace GodUnityPlugin
         public Color gizmoOverColor = Color.gray;
         public Color gizmoFailColor = Color.red;
 
-        private Grid grid;
+        private GUPGrid grid;
         private BoxCollider gridBox;
 
         public void SynchronizeCollider()
@@ -41,7 +41,7 @@ namespace GodUnityPlugin
 
         private void Awake()
         {
-            grid = GetComponent<Grid>();
+            grid = GetComponent<GUPGrid>();
 
             gridBox = GetComponent<BoxCollider>();
             if (gridBox == null)
@@ -60,7 +60,7 @@ namespace GodUnityPlugin
             if (autoSynchronize)
                 SynchronizeCollider();
 
-            GridCell selected;
+            GUPGridCell selected;
             Vector3 point;
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -142,9 +142,9 @@ namespace GodUnityPlugin
             }
         }
 
-        private bool CheckGridCell(RaycastHit[] hits, out GridCell cell)
+        private bool CheckGridCell(RaycastHit[] hits, out GUPGridCell cell)
         {
-            cell = new GridCell();
+            cell = new GUPGridCell();
 
             foreach (RaycastHit hit in hits)
             {
@@ -174,13 +174,13 @@ namespace GodUnityPlugin
             return false;
         }
 
-        private void OnSelect(GridCell cell)
+        private void OnSelect(GUPGridCell cell)
         {
             Debug.Log("select cell : name [" + cell.id + "], matrix [" + cell.columnIndex + "], [" + cell.rowIndex + "]");
         }
 
 #if UNITY_EDITOR
-        private void DrawGizmoCell(GridCell cell, Color color)
+        private void DrawGizmoCell(GUPGridCell cell, Color color)
         {
             if (!drawGizmos)
                 return;
@@ -191,7 +191,7 @@ namespace GodUnityPlugin
             Debug.DrawLine(vertices[1], vertices[2], color);
         }
 
-        private void DrawGizmoCell(GridCell cell, Color color, float duration)
+        private void DrawGizmoCell(GUPGridCell cell, Color color, float duration)
         {
             if (!drawGizmos)
                 return;
@@ -224,7 +224,7 @@ namespace GodUnityPlugin
             Debug.DrawLine(vertices[1], vertices[2], color, duration);
         }
 
-        private Vector3[] GetGizmoVertices(GridCell cell)
+        private Vector3[] GetGizmoVertices(GUPGridCell cell)
         {
             Vector3 a = cell.vertices[0];
             Vector3 b = cell.vertices[1];
