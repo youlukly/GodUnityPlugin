@@ -31,8 +31,6 @@ namespace GodUnityPlugin
             remainCoolTime = 0.0f;
         }
 
-        #region PatternBase
-
         public bool IsTransition(out string ID)
         {
             ID = null;
@@ -194,7 +192,5 @@ namespace GodUnityPlugin
 
             isRunning = false;
         }
-
-        #endregion
     }
 }

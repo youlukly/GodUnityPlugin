@@ -4,5 +4,5 @@
 namespace GodUnityPlugin
 {
     [System.Serializable]
-    public class GridCellUnityEvent : UnityEvent<GUPGridCell> { }
+    public class GridCellUnityEvent : UnityEvent<GridCell> { }
 }

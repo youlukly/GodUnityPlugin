@@ -15,10 +15,10 @@ namespace GodUnityPlugin
             this.states = states;
         }
 
-        public void Init(List<IGUPState> states, string id)
+        public void Init(List<IGUPState> states, string initState)
         {
             this.states = states;
-
+            TransitionToState(initState);
         }
 
         public IGUPState Get(string id)

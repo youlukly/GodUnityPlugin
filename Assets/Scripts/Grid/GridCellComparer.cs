@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace GodUnityPlugin
 {
-    public class GridCellComparer : IEqualityComparer<GUPGridCell>
+    public class GridCellComparer : IEqualityComparer<GridCell>
     {
-        public bool Equals(GUPGridCell x, GUPGridCell y)
+        public bool Equals(GridCell x, GridCell y)
         {
             return x.center == y.center &&
             x.columnIndex == y.columnIndex &&
@@ -17,7 +17,7 @@ namespace GodUnityPlugin
             x.normal == y.normal;
         }
 
-        public int GetHashCode(GUPGridCell cell)
+        public int GetHashCode(GridCell cell)
         {
             return (int)cell.GetHashCode();    
         }

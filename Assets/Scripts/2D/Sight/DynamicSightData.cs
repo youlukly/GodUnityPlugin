@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GodUnityPlugin
 {
-    [CreateAssetMenu(menuName = "VaporWorld/AI/Data/DynamicSight")]
+    [CreateAssetMenu(menuName = "GodUnityPlugin/Sight/Data/DynamicSight")]
     public class DynamicSightData : ScriptableObject
     {
         [SerializeField] private DynamicSight.Sight[] sights;

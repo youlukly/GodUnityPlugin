@@ -2,7 +2,7 @@
 
 namespace GodUnityPlugin
 {
-    public class GUPGrid : MonoBehaviour
+    public class Grid : MonoBehaviour
     {
         [Header("Grid")]
         // universal grid scale
@@ -25,7 +25,7 @@ namespace GodUnityPlugin
         public Color gizmoLineColor = new Color(0.25f, 0.1f, 0.25f, 1f);
 
         // array of the grid cells
-        public GUPGridCell[][] CellArray { get; private set; }
+        public GridCell[][] CellArray { get; private set; }
 
         // total width of the grid
         public float Width { get { return AbsCellWidth * Row * gridScale; } }
@@ -87,20 +87,20 @@ namespace GodUnityPlugin
         private float yOffsetMax { get { return -yOffsetMin; } }
   
         // returns the cell that matches the ID
-        public GUPGridCell Get(string id)
+        public GridCell Get(string id)
         {
             for (int i = 0; i < Column; i++)
             {
                 for (int j = 0; j < Row; j++)
                 {
-                    GUPGridCell cell = CellArray[i][j];
+                    GridCell cell = CellArray[i][j];
 
                     if (cell.id == id)
                         return cell;
                 }
             }
 
-            return new GUPGridCell();
+            return new GridCell();
         }
 
         private void Awake()
@@ -109,15 +109,15 @@ namespace GodUnityPlugin
         }
 
         // check if a vector is in grid matrix
-        public bool IsInCell(Vector3 point,out GUPGridCell cell)
+        public bool IsInCell(Vector3 point,out GridCell cell)
         {
-            cell = new GUPGridCell();
+            cell = new GridCell();
 
             for (int i = 0; i < Column; i++)
             {
                 for (int j = 0; j < Row; j++)
                 {
-                    GUPGridCell current = CellArray[i][j];
+                    GridCell current = CellArray[i][j];
 
                     if (IsInCell(point,current))
                     {
@@ -148,13 +148,13 @@ namespace GodUnityPlugin
 
                     string name = cellName + " " + index;
 
-                    CellArray[i][j] = new GUPGridCell(name, cellCenter,normal,GetCellVertices(i,j, AbsCellWidth,AbsCellHeight),quaternionEuler, AbsCellWidth, AbsCellHeight, j, i);
+                    CellArray[i][j] = new GridCell(name, cellCenter,normal,GetCellVertices(i,j, AbsCellWidth,AbsCellHeight),quaternionEuler, AbsCellWidth, AbsCellHeight, j, i);
                 }
             }
         }
 
         // compare two cell values
-        public bool CompareCell(GUPGridCell x, GUPGridCell y)
+        public bool CompareCell(GridCell x, GridCell y)
         {
             return x.center == y.center &&
             x.columnIndex == y.columnIndex &&
@@ -225,7 +225,7 @@ namespace GodUnityPlugin
         }
 
         // check if a vector is in cell element
-        private bool IsInCell(Vector3 point,GUPGridCell cell)
+        private bool IsInCell(Vector3 point,GridCell cell)
         {
             Vector3[] vertices = GetCellVertices(cell.columnIndex,cell.rowIndex,cell.width,cell.height);
 
@@ -263,9 +263,9 @@ namespace GodUnityPlugin
         // initialize cell array
         private void InitializeArray()
         {
-            CellArray = new GUPGridCell[Column][];
+            CellArray = new GridCell[Column][];
             for (int i = 0; i < CellArray.Length; i++)
-                CellArray[i] = new GUPGridCell[Row];
+                CellArray[i] = new GridCell[Row];
         }
 
 #if UNITY_EDITOR

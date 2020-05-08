@@ -1,60 +1,62 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GodUnityPlugin;
 
-public class GridMover : MonoBehaviour
+namespace GodUnityPlugin.Examples
 {
-    public GUPGridSelector gridSelector;
-    public GUPGrid grid;
-
-    public GUPGridCell origin;
-
-    private float buffer = 0.0f;
-
-    private void Awake()
+    public class GridMover : MonoBehaviour
     {
-        buffer = transform.position.y;
+        public GridSelector gridSelector;
+        public GodUnityPlugin.Grid grid;
 
-        gridSelector.onDownCell.AddListener(OnDownCell);
-        gridSelector.onDrag.AddListener(OnDrag);
-        gridSelector.onUp.AddListener(OnUp);
-    }
+        public GridCell origin;
 
-    private void OnDownCell(GUPGridCell cell)
-    {
-        SetGameObjectPosToCell(cell);
-    }
+        private float buffer = 0.0f;
 
-    private void OnDrag(Vector3 point)
-    {
-        Vector3 heightBuffer = grid.normal * buffer;
+        private void Awake()
+        {
+            buffer = transform.position.y;
 
-        transform.position = point + heightBuffer;
-    }
+            gridSelector.onDownCell.AddListener(OnDownCell);
+            gridSelector.onDrag.AddListener(OnDrag);
+            gridSelector.onUp.AddListener(OnUp);
+        }
 
-    private void OnUp(Vector3 point)
-    {
-        GUPGridCell cell;
-
-        if (grid.IsInCell(point, out cell))
+        private void OnDownCell(GridCell cell)
+        {
             SetGameObjectPosToCell(cell);
-        else
-            SetGameObjectPosToOrigin();
-    }
+        }
 
-    private void SetGameObjectPosToCell(GUPGridCell cell)
-    {
-        Vector3 heightBuffer = cell.normal * buffer;
+        private void OnDrag(Vector3 point)
+        {
+            Vector3 heightBuffer = grid.normal * buffer;
 
-        transform.position = cell.center + heightBuffer;
-        transform.rotation = grid.transform.rotation;
+            transform.position = point + heightBuffer;
+        }
 
-        origin = cell;
-    }
+        private void OnUp(Vector3 point)
+        {
+            GridCell cell;
 
-    private void SetGameObjectPosToOrigin()
-    {
-        SetGameObjectPosToCell(origin);
+            if (grid.IsInCell(point, out cell))
+                SetGameObjectPosToCell(cell);
+            else
+                SetGameObjectPosToOrigin();
+        }
+
+        private void SetGameObjectPosToCell(GridCell cell)
+        {
+            Vector3 heightBuffer = cell.normal * buffer;
+
+            transform.position = cell.center + heightBuffer;
+            transform.rotation = grid.transform.rotation;
+
+            origin = cell;
+        }
+
+        private void SetGameObjectPosToOrigin()
+        {
+            SetGameObjectPosToCell(origin);
+        }
     }
 }
