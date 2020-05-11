@@ -7,7 +7,7 @@ namespace GodUnityPlugin.Examples
     public class GridMover : MonoBehaviour
     {
         public GridSelector gridSelector;
-        public GodUnityPlugin.Grid grid;
+        public GodUnityPlugin.GUPGrid grid;
 
         public GridCell origin;
 

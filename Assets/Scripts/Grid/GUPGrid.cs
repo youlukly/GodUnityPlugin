@@ -2,11 +2,11 @@
 
 namespace GodUnityPlugin
 {
-    public class Grid : MonoBehaviour
+    public class GUPGrid : MonoBehaviour
     {
         [Header("Grid")]
         // universal grid scale
-        [SerializeField] private float gridScale = 1f;
+        [SerializeField] private float scale = 1f;
         // count of the grid array
         [SerializeField] private int row = 5;
         [SerializeField] private int column = 5;
@@ -27,14 +27,16 @@ namespace GodUnityPlugin
         // array of the grid cells
         public GridCell[][] CellArray { get; private set; }
 
+        public float Scale { get { return Mathf.Abs(scale); } }
+
         // total width of the grid
-        public float Width { get { return AbsCellWidth * Row * gridScale; } }
+        public float Width { get { return CellWidth * Row; } }
 
         // total height of the grid
-        public float Height { get { return AbsCellHeight * Column * gridScale; } }
+        public float Height { get { return CellHeight * Column; } }
 
         // center of the grid
-        public Vector3 center { get { return ( Quaternion.Inverse(quaternionEuler) * transform.position) + gridOffset; } }
+        public Vector3 Center { get { return transform.position + gridOffset; } }
 
         // normal of the grid
         public Vector3 normal { get { return GetNormal(); } }
@@ -68,11 +70,11 @@ namespace GodUnityPlugin
         // euler quaternion of grid gameObject
         public Quaternion quaternionEuler { get { return Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z); } }
 
-        // absolute number of cell width
-        public float AbsCellWidth { get { return Mathf.Abs(cellWidth); } }
+        // total width of the cell
+        public float CellWidth { get { return Mathf.Abs(cellWidth) * Scale; } }
 
-        // absolute number of cell height
-        public float AbsCellHeight { get { return Mathf.Abs(cellHeight); } }
+        // total height of the cell
+        public float CellHeight { get { return Mathf.Abs(cellHeight) * Scale; } }
 
         // minimal x-axis value of grid
         private float xOffsetMin { get { return -(Width / 2.0f); } }
@@ -86,6 +88,8 @@ namespace GodUnityPlugin
         // maximum y-axis value of grid
         private float yOffsetMax { get { return -yOffsetMin; } }
   
+        private Vector3 calibratedCenter { get { return (Quaternion.Inverse(quaternionEuler)* transform.position) + gridOffset;  } }
+
         // returns the cell that matches the ID
         public GridCell Get(string id)
         {
@@ -148,7 +152,7 @@ namespace GodUnityPlugin
 
                     string name = cellName + " " + index;
 
-                    CellArray[i][j] = new GridCell(name, cellCenter,normal,GetCellVertices(i,j, AbsCellWidth,AbsCellHeight),quaternionEuler, AbsCellWidth, AbsCellHeight, j, i);
+                    CellArray[i][j] = new GridCell(name, cellCenter,normal,GetCellVertices(i,j, CellWidth,CellHeight),quaternionEuler, CellWidth, CellHeight, j, i);
                 }
             }
         }
@@ -188,8 +192,6 @@ namespace GodUnityPlugin
         // returns normal of the grid.
         private Vector3 GetNormal()
         {
-            Vector3 normal = Vector3.zero;
-
             Vector3[] vert = vertices;
 
             Vector3 a = vert[0];
@@ -207,17 +209,15 @@ namespace GodUnityPlugin
         // returns vertices of the grid. always returns 4 values with matrix order
         private Vector3[] GetVertices()
         {
-            Vector3 centerRaw = transform.position + gridOffset;
+            float xMin = calibratedCenter.x - (Width / 2.0f);
+            float xMax = calibratedCenter.x + (Width / 2.0f);
+            float yMin = calibratedCenter.y - (Height / 2.0f);
+            float yMax = calibratedCenter.y + (Height / 2.0f);
 
-            float xMin = centerRaw.x - (Width / 2.0f);
-            float xMax = centerRaw.x + (Width / 2.0f);
-            float yMin = centerRaw.y - (Height / 2.0f);
-            float yMax = centerRaw.y + (Height / 2.0f);
-
-            Vector3 a = quaternionEuler * new Vector3(xMin, yMax);
-            Vector3 b = quaternionEuler * new Vector3(xMax, yMax);
-            Vector3 c = quaternionEuler * new Vector3(xMin, yMin);
-            Vector3 d = quaternionEuler * new Vector3(xMax, yMin);
+            Vector3 a = quaternionEuler * new Vector3(xMin, yMax, calibratedCenter.z);
+            Vector3 b = quaternionEuler * new Vector3(xMax, yMax, calibratedCenter.z);
+            Vector3 c = quaternionEuler * new Vector3(xMin, yMin, calibratedCenter.z);
+            Vector3 d = quaternionEuler * new Vector3(xMax, yMin, calibratedCenter.z);
 
             Vector3[] vertices = new Vector3[] { a, b, c, d };
 
@@ -240,13 +240,13 @@ namespace GodUnityPlugin
         // uncalibrated center of the cell 
         private Vector3 GetCellCenterRaw(int columnIndex, int rowIndex)
         {
-            Vector3 defaultCenter = center + new Vector3(xOffsetMin, yOffsetMax);
+            Vector3 defaultCenter = Center + new Vector3(xOffsetMin, yOffsetMax);
 
-            Vector3 buffer = new Vector3(AbsCellWidth / 2.0f, -AbsCellHeight / 2.0f) * gridScale;
+            Vector3 buffer = new Vector3(CellWidth / 2.0f, -CellHeight / 2.0f);
 
             defaultCenter = defaultCenter + buffer;
 
-            Vector3 cellCenter = defaultCenter + new Vector3(rowIndex * AbsCellWidth * gridScale, columnIndex * -AbsCellHeight * gridScale);
+            Vector3 cellCenter = defaultCenter + new Vector3(rowIndex * CellWidth, columnIndex * -CellHeight);
 
             return cellCenter;
         }
@@ -282,16 +282,16 @@ namespace GodUnityPlugin
                 else
                     Gizmos.color = Color.Lerp(Color.white, gizmoLineColor, 0.6f);
 
-                float y = yOffsetMax - (x * AbsCellHeight * gridScale);
+                float y = yOffsetMax - (x * CellHeight);
 
-                Vector3 pos1 = center + new Vector3(xOffsetMin, y, 0);
-                Vector3 pos2 = center + new Vector3(xOffsetMax, y, 0);
+                Vector3 pos1 = calibratedCenter + new Vector3(xOffsetMin, y, 0);
+                Vector3 pos2 = calibratedCenter + new Vector3(xOffsetMax, y, 0);
 
                 pos1 = quaternionEuler * pos1;
 
                 pos2 = quaternionEuler * pos2;
 
-                Gizmos.DrawLine((gridOffset + pos1), (gridOffset + pos2));
+                Gizmos.DrawLine(pos1, pos2);
             }
 
             // draw the vertical lines
@@ -302,19 +302,19 @@ namespace GodUnityPlugin
                 else
                     Gizmos.color = Color.Lerp(Color.white, gizmoLineColor, 0.6f);
 
-                float x = xOffsetMin + (y * AbsCellWidth * gridScale);
+                float x = xOffsetMin + (y * CellWidth);
 
-                Vector3 pos1 = center + new Vector3(x, yOffsetMax, 0);
-                Vector3 pos2 = center + new Vector3(x, yOffsetMin, 0);
+                Vector3 pos1 = calibratedCenter + new Vector3(x, yOffsetMax, 0);
+                Vector3 pos2 = calibratedCenter + new Vector3(x, yOffsetMin, 0);
 
                 pos1 = quaternionEuler * pos1;
 
                 pos2 = quaternionEuler * pos2;
 
-                Gizmos.DrawLine((gridOffset + pos1), (gridOffset + pos2));
+                Gizmos.DrawLine(pos1,pos2);
             }
 
-            float range = AbsCellWidth + AbsCellHeight;
+            float range = CellWidth + CellHeight;
 
             range = range / 2.0f;
 
@@ -322,7 +322,10 @@ namespace GodUnityPlugin
 
             Gizmos.color = Color.Lerp(Color.black, gizmoLineColor, 0.4f);
 
-            Gizmos.DrawLine(center,center+dir);
+            Gizmos.DrawLine(Center,Center+dir);
+
+            for (int i = 0; i < vertices.Length; i++)
+                Gizmos.DrawSphere(vertices[i], range * 0.1f);
         }
 #endif
 

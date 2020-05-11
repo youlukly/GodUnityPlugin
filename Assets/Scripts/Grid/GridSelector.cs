@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-using UnityEditor;
 
 namespace GodUnityPlugin
 {
-    [RequireComponent(typeof(Grid))]
+    [RequireComponent(typeof(GUPGrid))]
     public class GridSelector : MonoBehaviour
     {
+        public new Camera camera;
         public bool allowInput = true;
         public bool autoSynchronize = false;
 
@@ -20,7 +20,7 @@ namespace GodUnityPlugin
         public Vector3UnityEvent onUp;
         public GridCellUnityEvent onOverCell;
         public Vector3UnityEvent onOver;
-
+        
         [Header("Gizmos")]
         [SerializeField] private bool drawGizmos = true;
         public Color gizmoDownColor = Color.green;
@@ -29,19 +29,19 @@ namespace GodUnityPlugin
         public Color gizmoOverColor = Color.gray;
         public Color gizmoFailColor = Color.red;
 
-        private Grid grid;
+        private GUPGrid grid;
         private BoxCollider gridBox;
 
         public void SynchronizeCollider()
         {
-            Bounds bounds = new Bounds(grid.center, new Vector2(grid.Width, grid.Height));
+            Bounds bounds = new Bounds(grid.Center, new Vector2(grid.Width, grid.Height));
 
             gridBox.size = bounds.size;
         }
 
         private void Awake()
         {
-            grid = GetComponent<Grid>();
+            grid = GetComponent<GUPGrid>();
 
             gridBox = GetComponent<BoxCollider>();
             if (gridBox == null)
@@ -57,13 +57,25 @@ namespace GodUnityPlugin
             if (!allowInput)
                 return;
 
+            if (!camera)
+            {
+                camera = FindObjectOfType<Camera>();
+
+                if (!camera)
+                {
+                    Debug.LogWarning("no active camera detected!!!!");
+                    allowInput = false;
+                    return;
+                }
+            }
+
             if (autoSynchronize)
                 SynchronizeCollider();
 
             GridCell selected;
             Vector3 point;
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
             RaycastHit[] hits = Physics.RaycastAll(ray);
 
             bool isInCell = false;
@@ -241,7 +253,7 @@ namespace GodUnityPlugin
             Vector3 c = grid.vertices[2];
             Vector3 d = grid.vertices[3];
 
-            float mag = Mathf.Clamp(grid.AbsCellWidth / 5f, grid.AbsCellWidth / 5f, grid.AbsCellHeight / 5f);
+            float mag = Mathf.Clamp(grid.CellWidth / 5f, grid.CellWidth / 5f, grid.CellHeight / 5f);
 
             Vector3 dir1 = (a - d).normalized * mag;
             Vector3 dir2 = (b - c).normalized * mag;
