@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace VaporWorld
+namespace GodUnityPlugin
 {
     public class StatusEffect
     {
