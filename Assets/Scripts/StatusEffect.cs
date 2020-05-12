@@ -8,13 +8,7 @@ namespace GodUnityPlugin
     {
         public enum EffectType
         {
-            ResistStagger,
-            ResistKnockback,
-            Burn,
-            Frozen,
-            Electrocuted,
-            Poisoned,
-            Defense,
+            None,
         }
 
         private Dictionary<string, EffectType> effectPairs = new Dictionary<string, EffectType>();
