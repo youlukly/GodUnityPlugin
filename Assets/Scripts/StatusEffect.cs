@@ -6,27 +6,24 @@ namespace GodUnityPlugin
 {
     public class StatusEffect
     {
-        public enum EffectType
-        {
-            None,
-        }
+        public string[] effectType;
 
-        private Dictionary<string, EffectType> effectPairs = new Dictionary<string, EffectType>();
+        private Dictionary<string, string> effectPairs = new Dictionary<string, string>();
 
-        public void AddEffect(string effectName, EffectType type)
+        public void AddEffect(string id, string type)
         {
-            if (effectPairs.ContainsKey(effectName))
+            if (effectPairs.ContainsKey(id))
                 return;
 
-            effectPairs.Add(effectName, type);
+            effectPairs.Add(id, type);
         }
 
-        public void RemoveEffect(string effectName)
+        public void RemoveEffect(string id)
         {
-            if (!effectPairs.ContainsKey(effectName))
+            if (!effectPairs.ContainsKey(id))
                 return;
 
-            effectPairs.Remove(effectName);
+            effectPairs.Remove(id);
         }
 
         public void RemoveAllEffects()
@@ -34,12 +31,12 @@ namespace GodUnityPlugin
             effectPairs.Clear();
         }
 
-        public void RemoveAllEffects(EffectType type)
+        public void RemoveAllEffects(string type)
         {
             if (!effectPairs.ContainsValue(type))
                 return;
 
-            Dictionary<string, EffectType> newPairs = new Dictionary<string, EffectType>();
+            Dictionary<string, string> newPairs = new Dictionary<string, string>();
 
             foreach (var effectPair in effectPairs)
             {
@@ -52,14 +49,14 @@ namespace GodUnityPlugin
             effectPairs = newPairs;
         }
 
-        public bool IsEffecedByType(EffectType type)
+        public bool IsEffecedByType(string type)
         {
             return effectPairs.ContainsValue(type);
         }
 
-        public bool IsEffectedByID(string effectName)
+        public bool IsEffectedByID(string id)
         {
-            return effectPairs.ContainsKey(effectName);
+            return effectPairs.ContainsKey(id);
         }
     }
 }
