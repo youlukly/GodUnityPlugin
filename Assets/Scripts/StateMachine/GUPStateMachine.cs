@@ -42,6 +42,14 @@ namespace GodUnityPlugin
             states.Add(state);
         }
 
+        public void Remove(IGUPState state)
+        {
+            if (!states.Contains(state))
+                return;
+
+            states.Remove(state);
+        }
+
         public void TransitionToState(string id)
         {
             IGUPState next = Get(id);
