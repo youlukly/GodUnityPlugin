@@ -85,7 +85,9 @@ namespace GodUnityPlugin
                 if (CheckGridCell(hits, out selected))
                 {
                     onDownCell.Invoke(selected);
+#if UNITY_EDITOR
                     DrawGizmoCell(selected, gizmoDownColor, 0.75f);
+#endif
                     isInCell = true;
                 }
 
@@ -95,7 +97,9 @@ namespace GodUnityPlugin
 
                     Color pointColor = isInCell ? gizmoDownColor : gizmoFailColor;
 
+#if UNITY_EDITOR
                     DrawGizmoPoint(point, Color.Lerp(pointColor, Color.black, 0.35f), 0.5f);
+#endif
                 }
             }
             else if (Input.GetMouseButton(0))
@@ -103,7 +107,9 @@ namespace GodUnityPlugin
                 if (CheckGridCell(hits, out selected))
                 {
                     onDragCell.Invoke(selected);
+#if UNITY_EDITOR
                     DrawGizmoCell(selected, gizmoDragColor);
+#endif
                     isInCell = true;
                 }
 
@@ -113,7 +119,9 @@ namespace GodUnityPlugin
 
                     Color pointColor = isInCell ? gizmoDragColor : gizmoFailColor;
 
+#if UNITY_EDITOR
                     DrawGizmoPoint(point, Color.Lerp(pointColor, Color.black, 0.35f));
+#endif
                 }
             }
             else if (Input.GetMouseButtonUp(0))
@@ -121,7 +129,9 @@ namespace GodUnityPlugin
                 if (CheckGridCell(hits, out selected))
                 {
                     onUpCell.Invoke(selected);
+#if UNITY_EDITOR
                     DrawGizmoCell(selected, gizmoUpColor, 0.75f);
+#endif
                     isInCell = true;
                 }
 
@@ -131,7 +141,9 @@ namespace GodUnityPlugin
 
                     Color pointColor = isInCell ? gizmoUpColor : gizmoFailColor;
 
+#if UNITY_EDITOR
                     DrawGizmoPoint(point, Color.Lerp(pointColor, Color.black, 0.35f), 0.5f);
+#endif
                 }
             }
             else 
@@ -139,7 +151,9 @@ namespace GodUnityPlugin
                 if (CheckGridCell(hits, out selected))
                 {
                     onOverCell.Invoke(selected);
+#if UNITY_EDITOR
                     DrawGizmoCell(selected, gizmoUpColor);
+#endif
                     isInCell = true;
                 }
 
@@ -149,7 +163,9 @@ namespace GodUnityPlugin
 
                     Color pointColor = isInCell ? gizmoOverColor : gizmoFailColor;
 
+#if UNITY_EDITOR
                     DrawGizmoPoint(point, Color.Lerp(pointColor, Color.black, 0.35f));
+#endif
                 }
             }
         }
