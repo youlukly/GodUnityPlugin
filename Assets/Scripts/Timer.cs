@@ -51,17 +51,6 @@ namespace GodUnityPlugin
             return timerPair[key];
         }
 
-        public float GetTimer(string key,float time)
-        {
-            if (!timerPair.ContainsKey(key))
-            {
-                StartTimer(key,time);
-                return time;
-            }
-
-            return timerPair[key];
-        }
-
         public bool TryGetTimer(string key,out float time)
         {
             time = 0.0f;

@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IGUPState
+namespace GodUnityPlugin
 {
-    string id { get; }
+    public interface IGUPState
+    {
+        string id { get; }
 
-    void OnEnter();
-    void OnExit();
-    void OnUpdate();
-    void OnLateUpdate();
-    void OnFixedUpdate();
+        void OnEnter();
+        void OnExit();
+        void OnUpdate();
+        void OnLateUpdate();
+        void OnFixedUpdate();
 
-    bool IsTransition(out string ID);
+        bool IsTransition(out string ID);
+    }
 }
