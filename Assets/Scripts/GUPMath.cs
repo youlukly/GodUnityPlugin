@@ -8,6 +8,9 @@ namespace GodUnityPlugin
     {
         public static float Quotient(float dividend, float divisor)
         {
+            if (divisor > dividend)
+                return 0;
+
             float remainder = dividend % divisor;
 
             float multiple = dividend - remainder;
@@ -17,6 +20,9 @@ namespace GodUnityPlugin
 
         public static int Quotient(int dividend, int divisor)
         {
+            if (divisor > dividend)
+                return 0;
+
             int remainder = dividend % divisor;
 
             int multiple = dividend - remainder;

@@ -29,6 +29,8 @@ namespace GodUnityPlugin
 
         public float Scale { get { return Mathf.Abs(scale); } }
 
+        public int Count { get { return Row * Column; } }
+
         // total width of the grid
         public float Width { get { return CellWidth * Row; } }
 
@@ -91,25 +93,52 @@ namespace GodUnityPlugin
         private Vector3 calibratedCenter { get { return (Quaternion.Inverse(quaternionEuler)* transform.position) + gridOffset;  } }
 
         // returns the cell that matches the ID
-        public GridCell Get(string id)
+        public bool TryGet(string id,out GridCell cell)
         {
+            cell = new GridCell();
+
             for (int i = 0; i < Column; i++)
             {
                 for (int j = 0; j < Row; j++)
                 {
-                    GridCell cell = CellArray[i][j];
+                    GridCell gridCell = CellArray[i][j];
 
-                    if (cell.id == id)
-                        return cell;
+                    if (gridCell.id == id)
+                    {
+                        cell = gridCell;
+                        return true;
+                    }
                 }
             }
 
-            return new GridCell();
+            return false;
         }
 
-        private void Awake()
+        // returns the cell that matches the ID
+        public bool TryGet(int index,out GridCell cell)
         {
-            UpdateCellMatrix();
+            cell = new GridCell();
+
+            if (index > Count)
+                return false;
+
+            int column = GUPMath.Quotient(index, Column);
+
+            int row = index % Row;
+
+            cell = CellArray[column][row];
+            return true;
+        }
+
+        public bool TryGet(int row, int column,out GridCell cell)
+        {
+            cell = new GridCell();
+
+            if (row != Row || column != Column)
+                return false;
+
+            cell = CellArray[column][row];
+            return true;
         }
 
         // check if a vector is in grid matrix
@@ -167,6 +196,11 @@ namespace GodUnityPlugin
             x.width == y.width &&
             x.id == y.id &&
             x.normal == y.normal;
+        }
+
+        private void Awake()
+        {
+            UpdateCellMatrix();
         }
 
         // returns vertices of the cell. always returns 4 values with matrix order
