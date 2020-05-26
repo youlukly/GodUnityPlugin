@@ -174,16 +174,12 @@ namespace GodUnityPlugin
         {
             cell = new GridCell();
 
-            foreach (RaycastHit hit in hits)
-            {
-                if (hit.collider != null && hit.collider == gridBox)
-                {
-                    if (grid.IsInCell(hit.point, out cell))
-                        return true;
-                }
-            }
+            Vector3 point;
 
-            return false;
+            if (!CheckGridPoint(hits, out point))
+                return false;
+
+            return grid.IsInCell(point, out cell);
         }
 
         private bool CheckGridPoint(RaycastHit[] hits, out Vector3 point)
