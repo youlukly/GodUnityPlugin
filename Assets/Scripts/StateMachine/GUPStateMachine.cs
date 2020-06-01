@@ -50,6 +50,11 @@ namespace GodUnityPlugin
             states.Remove(state);
         }
 
+        public void Clear()
+        {
+            states.Clear();
+        }
+
         public void TransitionToState(string id)
         {
             IGUPState next = Get(id);
