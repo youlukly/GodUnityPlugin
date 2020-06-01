@@ -21,7 +21,7 @@ namespace GodUnityPlugin
         public T Get(T origin)
         {
             if (!poolPairs.ContainsKey(origin))
-                AddPool(origin, 1);
+                InitializePool(origin, 1);
 
             List<T> pool = poolPairs[origin];
 
@@ -31,14 +31,15 @@ namespace GodUnityPlugin
                     continue;
 
                 t.gameObject.SetActive(true);
+                t.transform.parent = null;
 
                 return t;
             }
 
-            T newGo = Object.Instantiate(origin);
-            pool.Add(newGo);
+            T newT = Object.Instantiate(origin);
+            pool.Add(newT);
 
-            return newGo;
+            return newT;
         }
 
         public void AddPool(T origin, uint preloadCount)
@@ -78,7 +79,6 @@ namespace GodUnityPlugin
             }
 
             poolPairs.Add(origin, pool);
-            Pool(origin);
         }
     }
 }
