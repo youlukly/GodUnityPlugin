@@ -7,6 +7,7 @@ namespace GodUnityPlugin
     public class Pooler<T> where T : Behaviour
     {
         private Dictionary<T, List<T>> poolPairs = new Dictionary<T, List<T>>();
+        private Dictionary<T, Transform> poolParentPairs = new Dictionary<T, Transform>();
 
         public Pooler()
         {
@@ -23,6 +24,13 @@ namespace GodUnityPlugin
             if (!poolPairs.ContainsKey(origin))
                 InitializePool(origin, 1);
 
+            if (!poolParentPairs.ContainsKey(origin) || poolParentPairs[origin].Equals(null))
+                CreatePoolParent(origin);
+
+            Transform parent = poolParentPairs[origin];
+
+            parent = poolParentPairs[origin];
+
             List<T> pool = poolPairs[origin];
 
             foreach (var t in pool)
@@ -31,12 +39,12 @@ namespace GodUnityPlugin
                     continue;
 
                 t.gameObject.SetActive(true);
-                t.transform.parent = null;
+                t.transform.parent = parent;
 
                 return t;
             }
 
-            T newT = Object.Instantiate(origin);
+            T newT = Object.Instantiate(origin, parent);
             pool.Add(newT);
 
             return newT;
@@ -69,16 +77,23 @@ namespace GodUnityPlugin
 
         private void InitializePool(T origin, uint preloadCount)
         {
+            CreatePoolParent(origin);
+
             List<T> pool = new List<T>();
 
             for (int i = 0; i < preloadCount; i++)
             {
-                T t = Object.Instantiate(origin);
+                T t = Object.Instantiate(origin, poolParentPairs[origin]);
                 t.gameObject.SetActive(false);
                 pool.Add(t);
             }
 
             poolPairs.Add(origin, pool);
+        }
+
+        private void CreatePoolParent(T origin)
+        {
+            poolParentPairs.Add(origin, new GameObject(origin.name + " " + "Pool").transform);
         }
     }
 }
