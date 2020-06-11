@@ -32,9 +32,23 @@ namespace GodUnityPlugin
                 remainTimePairs[effect] = duration;
         }
 
+        public void SetDuration<T>(float duration) where T : StatusEffect
+        {
+            if (!IsEffected<T>())
+                return;
+
+            if (remainTimePairs.ContainsKey(Get<T>()))
+                return;
+
+            remainTimePairs[Get<T>()] = duration;
+        }
+
         public void AddDuration<T>(float duration) where T : StatusEffect
         {
             if (!IsEffected<T>())
+                return;
+
+            if (remainTimePairs.ContainsKey(Get<T>()))
                 return;
 
             remainTimePairs[Get<T>()] += duration;
