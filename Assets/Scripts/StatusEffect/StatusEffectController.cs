@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 namespace GodUnityPlugin
 {
     public class StatusEffectController : MonoBehaviour
     {
+        public float updateSpeedMult { get; set; } = 1.0f;
+
         protected List<StatusEffect> effects = new List<StatusEffect>();
         protected Dictionary<StatusEffect, float> remainTimePairs = new Dictionary<StatusEffect, float>();
 
@@ -119,8 +120,13 @@ namespace GodUnityPlugin
             {
                 effect.OnUpdateEffect();
 
-                if (remainTimePairs.ContainsKey(effect) && remainTimePairs[effect] <= 0.0f)
-                    RemoveEffect(effect);
+                if (remainTimePairs.ContainsKey(effect))
+                {
+                    remainTimePairs[effect] += Time.deltaTime * updateSpeedMult;
+
+                    if(remainTimePairs[effect] <= 0.0f)
+                        RemoveEffect(effect);
+                }
             }
         }
 
@@ -135,6 +141,5 @@ namespace GodUnityPlugin
                 remainTimePairs.Remove(effect);
             effects.Remove(effect);
         }
-
     }
 }
