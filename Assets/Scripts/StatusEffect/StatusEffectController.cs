@@ -65,18 +65,18 @@ namespace GodUnityPlugin
 
         public void RemoveAllEffects()
         {
-            foreach (var effect in effects)
-                RemoveEffect(effect);
+            effects.Clear();
+            remainTimePairs.Clear();
         }
 
         public void RemoveAllEffects<T>() where T : StatusEffect
         {
-            foreach (var effect in effects)
+            for (int i = 0; i < effects.Count; i++)
             {
-                if (!effect.GetType().Equals(typeof(T)))
+                if (!effects[i].GetType().Equals(typeof(T)))
                     continue;
 
-                RemoveEffect(effect);
+                RemoveEffect(effects[i]);
             }
         }
 

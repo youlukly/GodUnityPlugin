@@ -29,8 +29,9 @@ namespace GodUnityPlugin
         public Color gizmoOverColor = Color.gray;
         public Color gizmoFailColor = Color.red;
 
-        private GUPGrid grid;
         private BoxCollider gridBox;
+
+        public GUPGrid grid { get; private set; }
 
         public void SynchronizeCollider()
         {
