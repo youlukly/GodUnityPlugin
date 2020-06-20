@@ -174,7 +174,7 @@ namespace GodUnityPlugin
                 for (int j = 0; j < Row; j++)
                 {
                     //calibrate by rotation
-                    Vector3 cellCenter = quaternionEuler * GetCellCenterRaw(i, j);
+                    Vector3 cellCenter = GetCellCenterRaw(i, j);
 
                     //name index suffix
                     int index = i * Row + j;
@@ -274,15 +274,15 @@ namespace GodUnityPlugin
         // uncalibrated center of the cell 
         private Vector3 GetCellCenterRaw(int columnIndex, int rowIndex)
         {
-            Vector3 defaultCenter = Center + new Vector3(xOffsetMin, yOffsetMax);
+            Vector3 defaultCenter = calibratedCenter + new Vector3(xOffsetMin, yOffsetMax);
 
             Vector3 buffer = new Vector3(CellWidth / 2.0f, -CellHeight / 2.0f);
 
             defaultCenter = defaultCenter + buffer;
-
+                
             Vector3 cellCenter = defaultCenter + new Vector3(rowIndex * CellWidth, columnIndex * -CellHeight);
 
-            return cellCenter;
+            return quaternionEuler * cellCenter;
         }
 
         // rename + centre the gameobject upon first time dragging the script into the editor. 
