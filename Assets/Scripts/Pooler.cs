@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GodUnityPlugin
 {
@@ -50,6 +51,23 @@ namespace GodUnityPlugin
             return newT;
         }
 
+        public T Get(T origin,string sceneName)
+        {
+            T pool = Get(origin);
+
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+
+                if (scene.name != sceneName)
+                    continue;
+
+                SceneManager.MoveGameObjectToScene(pool.gameObject,scene);
+            }
+
+            return pool;
+        }
+
         public void AddPool(T origin, uint preloadCount)
         {
             InitializePool(origin, preloadCount);
@@ -95,5 +113,6 @@ namespace GodUnityPlugin
         {
             poolParentPairs.Add(origin, new GameObject(origin.name + " " + "Pool").transform);
         }
+
     }
 }
