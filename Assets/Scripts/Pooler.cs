@@ -14,7 +14,7 @@ namespace GodUnityPlugin
         {
         }
 
-        public Pooler(uint preloadCount, params T[] origins)
+        public Pooler(int preloadCount, params T[] origins)
         {
             foreach (var origin in origins)
                 InitializePool(origin, preloadCount);
@@ -68,7 +68,7 @@ namespace GodUnityPlugin
             return pool;
         }
 
-        public void AddPool(T origin, uint preloadCount)
+        public void AddPool(T origin, int preloadCount)
         {
             InitializePool(origin, preloadCount);
         }
@@ -93,7 +93,7 @@ namespace GodUnityPlugin
                 Pool(pair.Key);
         }
 
-        private void InitializePool(T origin, uint preloadCount)
+        private void InitializePool(T origin, int preloadCount)
         {
             CreatePoolParent(origin);
 
