@@ -20,6 +20,24 @@ namespace GodUnityPlugin
                 InitializePool(origin, preloadCount);
         }
 
+        public Pooler(int preloadCount, List<T> origins)
+        {
+            foreach (var origin in origins)
+                InitializePool(origin, preloadCount);
+        }
+
+        public Pooler(int preloadCount, string sceneName ,params T[] origins)
+        {
+            foreach (var origin in origins)
+                InitializePool(origin, preloadCount, sceneName);
+        }
+
+        public Pooler(int preloadCount, string sceneName, List<T> origins)
+        {
+            foreach (var origin in origins)
+                InitializePool(origin, preloadCount,sceneName);
+        }
+
         public T Get(T origin)
         {
             if (!poolPairs.ContainsKey(origin))
@@ -51,26 +69,14 @@ namespace GodUnityPlugin
             return newT;
         }
 
-        public T Get(T origin,string sceneName)
-        {
-            T pool = Get(origin);
-
-            for (int i = 0; i < SceneManager.sceneCount; i++)
-            {
-                Scene scene = SceneManager.GetSceneAt(i);
-
-                if (scene.name != sceneName)
-                    continue;
-
-                SceneManager.MoveGameObjectToScene(pool.gameObject,scene);
-            }
-
-            return pool;
-        }
-
         public void AddPool(T origin, int preloadCount)
         {
             InitializePool(origin, preloadCount);
+        }
+
+        public void AddPool(T origin, int preloadCount,string sceneName)
+        {
+            InitializePool(origin, preloadCount,sceneName);
         }
 
         public void Pool(T origin)
@@ -109,10 +115,45 @@ namespace GodUnityPlugin
             poolPairs.Add(origin, pool);
         }
 
+        private void InitializePool(T origin, int preloadCount,string sceneName)
+        {
+            CreatePoolParent(origin,sceneName);
+
+            List<T> pool = new List<T>();
+
+            for (int i = 0; i < preloadCount; i++)
+            {
+                T t = Object.Instantiate(origin, poolParentPairs[origin]);
+                t.gameObject.SetActive(false);
+                pool.Add(t);
+            }
+
+            poolPairs.Add(origin, pool);
+        }
+
         private void CreatePoolParent(T origin)
         {
             poolParentPairs.Add(origin, new GameObject(origin.name + " " + "Pool").transform);
         }
 
+        private void CreatePoolParent(T origin,string sceneName)
+        {
+            GameObject parent = new GameObject(origin.name + " " + "Pool");
+            SetScene(parent,sceneName);
+            poolParentPairs.Add(origin, parent.transform);
+        }
+
+        private void SetScene(GameObject go,string sceneName)
+        {
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+
+                if (scene.name != sceneName)
+                    continue;
+
+                SceneManager.MoveGameObjectToScene(go, scene);
+            }
+        }
     }
 }
