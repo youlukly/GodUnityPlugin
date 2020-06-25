@@ -174,7 +174,7 @@ namespace GodUnityPlugin
                 for (int j = 0; j < Row; j++)
                 {
                     //calibrate by rotation
-                    Vector3 cellCenter = GetCellCenterRaw(i, j);
+                    Vector3 cellCenter = GetCellCenter(i, j);
 
                     //name index suffix
                     int index = i * Row + j;
@@ -282,7 +282,13 @@ namespace GodUnityPlugin
                 
             Vector3 cellCenter = defaultCenter + new Vector3(rowIndex * CellWidth, columnIndex * -CellHeight);
 
-            return quaternionEuler * cellCenter;
+            return cellCenter;
+        }
+
+        // calibrated center of the cell 
+        private Vector3 GetCellCenter(int columnIndex, int rowIndex)
+        {
+            return quaternionEuler * GetCellCenterRaw(columnIndex,rowIndex);
         }
 
         // rename + centre the gameobject upon first time dragging the script into the editor. 
@@ -360,6 +366,19 @@ namespace GodUnityPlugin
 
             for (int i = 0; i < vertices.Length; i++)
                 Gizmos.DrawSphere(vertices[i], range * 0.1f);
+
+            if (CellArray == null || CellArray.Length == 0)
+                return;
+
+            for (int i = 0; i < CellArray.Length; i++)
+                for (int j = 0; j < CellArray[i].Length; j++)
+                {
+                    GridCell cell = CellArray[i][j];
+
+                    Gizmos.DrawLine(cell.vertices[0], cell.vertices[3]);
+                    Gizmos.DrawLine(cell.vertices[1], cell.vertices[2]);
+                    Gizmos.DrawRay(CellArray[i][j].center, CellArray[i][j].normal * scale);
+                }
         }
 #endif
 

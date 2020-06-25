@@ -210,10 +210,8 @@ namespace GodUnityPlugin
             if (!drawGizmos)
                 return;
 
-            Vector3[] vertices = GetGizmoVertices(cell);
-
-            Debug.DrawLine(vertices[0], vertices[3], color);
-            Debug.DrawLine(vertices[1], vertices[2], color);
+            Debug.DrawLine(cell.vertices[0], cell.vertices[3], color);
+            Debug.DrawLine(cell.vertices[1], cell.vertices[2], color);
         }
 
         private void DrawGizmoCell(GridCell cell, Color color, float duration)
@@ -221,10 +219,8 @@ namespace GodUnityPlugin
             if (!drawGizmos)
                 return;
 
-            Vector3[] vertices = GetGizmoVertices(cell);
-
-            Debug.DrawLine(vertices[0], vertices[3], color, duration);
-            Debug.DrawLine(vertices[1], vertices[2], color, duration);
+            Debug.DrawLine(cell.vertices[0], cell.vertices[3], color, duration);
+            Debug.DrawLine(cell.vertices[1], cell.vertices[2], color, duration);
         }
 
         private void DrawGizmoPoint(Vector3 point, Color color)
