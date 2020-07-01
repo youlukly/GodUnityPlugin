@@ -130,13 +130,15 @@ namespace GodUnityPlugin
 
         private void Update()
         {
-            foreach (var effect in effects)
+            for (int i = 0; i < effects.Count; i++)
             {
+                StatusEffect effect = effects[i];
+
                 effect.OnUpdateEffect();
 
                 if (remainTimePairs.ContainsKey(effect))
                 {
-                    remainTimePairs[effect] += Time.deltaTime * updateSpeedMult;
+                    remainTimePairs[effect] -= Time.deltaTime * updateSpeedMult;
 
                     if(remainTimePairs[effect] <= 0.0f)
                         Dispel(effect);
