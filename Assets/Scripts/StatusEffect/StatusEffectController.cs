@@ -55,6 +55,20 @@ namespace GodUnityPlugin
             remainTimePairs[Get<T>()] += duration;
         }
 
+        public void DispelAllEffects()
+        {
+            for (int i = 0; i < effects.Count; i++)
+                Dispel(effects[i]);
+        }
+
+        public void DispelEffect<T>() where T : StatusEffect
+        {
+            if (!IsEffected<T>())
+                return;
+
+            Dispel(Get<T>());
+        }
+
         public void RemoveEffect<T>() where T : StatusEffect
         {
             if (!IsEffected<T>())
@@ -125,17 +139,21 @@ namespace GodUnityPlugin
                     remainTimePairs[effect] += Time.deltaTime * updateSpeedMult;
 
                     if(remainTimePairs[effect] <= 0.0f)
-                        RemoveEffect(effect);
+                        Dispel(effect);
                 }
             }
+        }
+
+        private void Dispel(StatusEffect effect)
+        {
+            effect.OnFinishEffect();
+            RemoveEffect(effect);
         }
 
         private void RemoveEffect(StatusEffect effect)
         {
             if (!effects.Contains(effect))
                 return;
-
-            effect.OnFinishEffect();
 
             if (remainTimePairs.ContainsKey(effect))
                 remainTimePairs.Remove(effect);
