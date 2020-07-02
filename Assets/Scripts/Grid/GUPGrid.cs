@@ -92,6 +92,30 @@ namespace GodUnityPlugin
   
         private Vector3 calibratedCenter { get { return (Quaternion.Inverse(quaternionEuler)* transform.position) + gridOffset;  } }
 
+        // returns the index that matches the Cell
+        public bool TryGet(GridCell cell, out int row, out int column)
+        {
+            row = 0;
+            column = 0;
+
+            for (int i = 0; i < Column; i++)
+            {
+                for (int j = 0; j < Row; j++)
+                {
+                    GridCell gridCell = CellArray[i][j];
+
+                    if (CompareCell(gridCell,cell))
+                    {
+                        row = j;
+                        column = i;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         // returns the cell that matches the ID
         public bool TryGet(string id,out GridCell cell)
         {
