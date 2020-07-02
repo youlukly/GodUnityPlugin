@@ -14,26 +14,26 @@ namespace GodUnityPlugin
                 stackValuePairs.Add(initialStackValue, new Dictionary<string, float>());
         }
 
-        public void AddStackValue(string id, string effectName, float value)
+        public void AddStackValue(string id, string valueName, float value)
         {
             if (!stackValuePairs.ContainsKey(id))
                 stackValuePairs.Add(id, new Dictionary<string, float>());
 
-            if (!stackValuePairs[id].ContainsKey(effectName))
-                stackValuePairs[id].Add(effectName, value);
+            if (!stackValuePairs[id].ContainsKey(valueName))
+                stackValuePairs[id].Add(valueName, value);
 
-            stackValuePairs[id][effectName] = value;
+            stackValuePairs[id][valueName] = value;
         }
 
-        public void RemoveStackValue(string id, string effectName)
+        public void RemoveStackValue(string id, string valueName)
         {
             if (!stackValuePairs.ContainsKey(id))
                 return;
 
-            if (!stackValuePairs[id].ContainsKey(effectName))
+            if (!stackValuePairs[id].ContainsKey(valueName))
                 return;
 
-            stackValuePairs[id].Remove(effectName);
+            stackValuePairs[id].Remove(valueName);
         }
 
         public void RemoveStackValue(string id)
@@ -52,6 +52,25 @@ namespace GodUnityPlugin
         public void RemoveAllStackValues()
         {
             stackValuePairs.Clear();
+        }
+
+        public bool TryGetRawValues(string id, out float[] values)
+        {
+            values = null;
+
+            if (!stackValuePairs.ContainsKey(id))
+                return false;
+
+            values = new float[stackValuePairs[id].Count];
+
+            int i = 0;
+            foreach (var stackValuePair in stackValuePairs[id])
+            {
+                values[i] = stackValuePair.Value;
+                i++;
+            }
+
+            return true;
         }
 
         public bool TryGetArithmeticValue(string id, out float value)
