@@ -143,7 +143,7 @@ namespace GodUnityPlugin
         {
             cell = new GridCell();
 
-            if (index > Count)
+            if (index > Count || index < 0)
                 return false;
 
             int column = GUPMath.Quotient(index, Column);
@@ -158,7 +158,7 @@ namespace GodUnityPlugin
         {
             cell = new GridCell();
 
-            if (row != Row || column != Column)
+            if (row < 0 || column < 0 || column > CellArray.Length-1 || row > CellArray[0].Length-1)
                 return false;
 
             cell = CellArray[column][row];

@@ -107,6 +107,9 @@ namespace GodUnityPlugin
 
         private void Add(T origin, int preloadCount)
         {
+            if (origin == null)
+                return;
+
             if (poolPairs[origin].Count >= preloadCount)
                 return;
 
@@ -118,6 +121,9 @@ namespace GodUnityPlugin
 
         private void Add(T origin, int preloadCount,string sceneName)
         {
+            if (origin == null)
+                return;
+
             if (poolPairs[origin].Count >= preloadCount)
                 return;
 
@@ -131,6 +137,9 @@ namespace GodUnityPlugin
 
         private void Initialize(T origin, int preloadCount)
         {
+            if (origin == null)
+                return;
+
             CreatePoolParent(origin);
 
             List<T> pool = new List<T>();
