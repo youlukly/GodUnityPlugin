@@ -26,7 +26,7 @@ namespace GodUnityPlugin
 
         public void SetTimer(string key,float value)
         {
-            if (timerPair.ContainsKey(key))
+            if (!timerPair.ContainsKey(key))
                 StartTimer(key, value);
             else
                 timerPair[key] = value;
