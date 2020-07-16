@@ -55,7 +55,7 @@ namespace GodUnityPlugin
             if (!IsEffectedBy(effect))
                 return;
 
-            if (remainTimePairs.ContainsKey(effect))
+            if (!remainTimePairs.ContainsKey(effect))
                 return;
 
             remainTimePairs[effect] += duration;
