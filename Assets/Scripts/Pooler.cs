@@ -58,7 +58,7 @@ namespace GodUnityPlugin
                     continue;
 
                 t.gameObject.SetActive(true);
-                t.transform.parent = parent;
+                t.transform.SetParent(parent);
 
                 return t;
             }

@@ -71,6 +71,11 @@ namespace GodUnityPlugin
             timerPair.Remove(key);
         }
 
+        public void ClearAllTimers()
+        {
+            timerPair.Clear();
+        }
+
         public bool IsElapsed(string key,float time)
         {
             if (!timerPair.ContainsKey(key))
