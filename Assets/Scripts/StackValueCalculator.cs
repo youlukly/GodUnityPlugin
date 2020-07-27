@@ -73,32 +73,6 @@ namespace GodUnityPlugin
             return true;
         }
 
-        public bool TryGetArithmeticValue(string id, out float value)
-        {
-            value = 0.0f;
-
-            if (!stackValuePairs.ContainsKey(id))
-                return false;
-
-            foreach (var stackValuePair in stackValuePairs[id])
-                value += stackValuePair.Value;
-
-            return true;
-        }
-
-        public bool TryGetMultiplicationValue(string id, out float value)
-        {
-            value = 0.0f;
-
-            if (!stackValuePairs.ContainsKey(id))
-                return false;
-
-            foreach (var stackValuePair in stackValuePairs[id])
-                value *= stackValuePair.Value;
-
-            return true;
-        }
-
         public bool TryGetArithmeticValue(string id, float defaultValue, out float value)
         {
             value = defaultValue;
