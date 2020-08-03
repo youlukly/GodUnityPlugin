@@ -154,6 +154,26 @@ namespace GodUnityPlugin
             return true;
         }
 
+        public bool TryGet(GridCell cell, out int index)
+        {
+            index = 0;
+
+            for (int i = 0; i < Column; i++)
+            {
+                for (int j = 0; j < Row; j++)
+                {
+                    GridCell gridCell = CellArray[i][j];
+
+                    if (CompareCell(cell,gridCell))
+                        return true;
+
+                    index++;
+                }
+            }
+
+            return false;
+        }
+
         public bool TryGet(int row, int column,out GridCell cell)
         {
             cell = new GridCell();
