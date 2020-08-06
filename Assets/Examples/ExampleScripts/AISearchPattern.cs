@@ -20,7 +20,7 @@ namespace GodUnityPlugin.Examples
 
         protected override void OnEnterPattern()
         {
-            ai.meshRenderer.material = ai.GetComponent<MeshRenderer>().material;
+            ai.meshRenderer.material = ai.GetComponent<Renderer>().material;
         }
 
         protected override void OnExitPattern()
