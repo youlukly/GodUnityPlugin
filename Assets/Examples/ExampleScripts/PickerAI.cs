@@ -15,7 +15,7 @@ namespace GodUnityPlugin.Examples
 
         public float patternMaxTime = 5.0f;
 
-        public MeshRenderer meshRenderer;
+        public Renderer meshRenderer;
 
         public PickUp currentTarget { get; set; }
 

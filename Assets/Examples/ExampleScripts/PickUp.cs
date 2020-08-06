@@ -6,7 +6,7 @@ namespace GodUnityPlugin.Examples
 {
     public class PickUp : MonoBehaviour
     {
-        public MeshRenderer meshRenderer;
+        public Renderer meshRenderer;
 
         private const float pickUpTimer = 5.0f;
 
