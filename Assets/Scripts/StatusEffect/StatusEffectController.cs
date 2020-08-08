@@ -75,7 +75,7 @@ namespace GodUnityPlugin
             for (int i = 0; i < effects.Count; i++)
             {
                 StatusEffect effect = effects[i];
-                RemoveEffect(effects[i]);
+                RemoveEffect(effect);
             }
         }
 
@@ -90,6 +90,29 @@ namespace GodUnityPlugin
                     continue;
 
                 RemoveEffect(effects[i]);
+            }
+        }
+
+        public void ClearAllEffects<T>() where T : StatusEffect
+        {
+            if (!IsEffectedBy<T>())
+                return;
+
+            for (int i = 0; i < effects.Count; i++)
+            {
+                if (!effects[i].GetType().Equals(typeof(T)))
+                    continue;
+
+                ClearEffect(effects[i]);
+            }
+        }
+
+        public void ClearAllEffects()
+        {
+            for (int i = 0; i < effects.Count; i++)
+            {
+                StatusEffect effect = effects[i];
+                ClearEffect(effect);
             }
         }
 
