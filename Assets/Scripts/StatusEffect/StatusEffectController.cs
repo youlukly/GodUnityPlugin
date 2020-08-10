@@ -75,8 +75,10 @@ namespace GodUnityPlugin
             for (int i = 0; i < effects.Count; i++)
             {
                 StatusEffect effect = effects[i];
-                RemoveEffect(effect);
+                effect.FinishEffect();
             }
+
+            ClearAllEffects();
         }
 
         public void RemoveAllEffects<T>() where T : StatusEffect
@@ -84,13 +86,20 @@ namespace GodUnityPlugin
             if (!IsEffectedBy<T>())
                 return;
 
+            List<StatusEffect> removes = new List<StatusEffect>();
+
             for (int i = 0; i < effects.Count; i++)
             {
                 if (!effects[i].GetType().Equals(typeof(T)))
                     continue;
 
-                RemoveEffect(effects[i]);
+                removes.Add(effects[i]);
             }
+
+            foreach (var remove in removes)
+                RemoveEffect(remove);
+
+            removes.Clear();
         }
 
         public void ClearAllEffects<T>() where T : StatusEffect
@@ -98,43 +107,27 @@ namespace GodUnityPlugin
             if (!IsEffectedBy<T>())
                 return;
 
+            List<StatusEffect> removes = new List<StatusEffect>();
+
             for (int i = 0; i < effects.Count; i++)
             {
                 if (!effects[i].GetType().Equals(typeof(T)))
                     continue;
 
-                ClearEffect(effects[i]);
+                removes.Add(effects[i]);
             }
+
+            foreach (var remove in removes)
+                ClearEffect(remove);
+
+            removes.Clear();
         }
 
         public void ClearAllEffects()
         {
-            for (int i = 0; i < effects.Count; i++)
-            {
-                StatusEffect effect = effects[i];
-                ClearEffect(effect);
-            }
+            effects.Clear();
+            remainTimePairs.Clear();
         }
-
-        //public void ClearAllEffects()
-        //{
-        //    effects.Clear();
-        //    remainTimePairs.Clear();
-        //}
-
-        //public void ClaerAllEffects<T>() where T : StatusEffect
-        //{
-        //    if (!IsEffectedBy<T>())
-        //        return;
-
-        //    for (int i = 0; i < effects.Count; i++)
-        //    {
-        //        if (!effects[i].GetType().Equals(typeof(T)))
-        //            continue;
-
-        //        ClearEffect(effects[i]);
-        //    }
-        //}
 
         public bool IsEffectedBy(StatusEffect effect)
         {
