@@ -6,6 +6,15 @@ namespace GodUnityPlugin
 {
     public static class GUPMath
     {
+        public static bool CheckRandomPercentChance(float chance)
+        {
+            chance = Mathf.Clamp(chance, 0,100.0f);
+
+            float ran = Random.Range(0, 100.0f);
+
+            return ran <= chance;
+        }
+
         public static float Quotient(float dividend, float divisor)
         {
             if (divisor > dividend)
@@ -35,19 +44,9 @@ namespace GodUnityPlugin
             return (reference * (percent / 100f));
         }
 
-        public static float PercentToValue(int value, int reference)
-        {
-            return (reference * (value / 100f));
-        }
-
         public static float ValueToPercent(float value, float reference)
         {
             return 100f * value / reference;
-        }
-
-        public static float ValueToPercent(int percent, int reference)
-        {
-            return 100f * percent / reference;
         }
 
         public static float Least(float[] values)
