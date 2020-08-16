@@ -94,6 +94,19 @@ namespace GodUnityPlugin
                 return false;
 
             foreach (var stackValuePair in stackValuePairs[id])
+                value += defaultValue * stackValuePair.Value;
+
+            return true;
+        }
+
+        public bool TryGetCompoundMultiplicationValue(string id, float defaultValue, out float value)
+        {
+            value = defaultValue;
+
+            if (!stackValuePairs.ContainsKey(id))
+                return false;
+
+            foreach (var stackValuePair in stackValuePairs[id])
                 value += value * stackValuePair.Value;
 
             return true;
