@@ -10,7 +10,6 @@ namespace GodUnityPlugin
         // count of the grid array
         [SerializeField] private int row = 5;
         [SerializeField] private int column = 5;
-        [SerializeField] private Vector3 gridOffset = Vector3.zero;
 
         [Space(10)]
         [Header("GridCell")]
@@ -38,7 +37,7 @@ namespace GodUnityPlugin
         public float Height { get { return CellHeight * Column; } }
 
         // center of the grid
-        public Vector3 Center { get { return transform.position + gridOffset; } }
+        public Vector3 Center { get { return transform.position; } }
 
         // normal of the grid
         public Vector3 normal { get { return GetNormal(); } }
@@ -90,7 +89,7 @@ namespace GodUnityPlugin
         // maximum y-axis value of grid
         private float yOffsetMax { get { return -yOffsetMin; } }
   
-        private Vector3 calibratedCenter { get { return (Quaternion.Inverse(quaternionEuler)* transform.position) + gridOffset;  } }
+        private Vector3 calibratedCenter { get { return Quaternion.Inverse(quaternionEuler)* Center;  } }
 
         // returns the index that matches the Cell
         public bool TryGet(GridCell cell, out int row, out int column)
