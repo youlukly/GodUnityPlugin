@@ -95,17 +95,6 @@ namespace GodUnityPlugin
             for (int i = 0; i < defaultMats.Length; i++)
                 defaultColors[i] = defaultMats[i].GetColor("_EmissionColor");
 
-            if (fadeSpeed == 0.0f)
-            {
-                for (int i = 0; i < renderers.Length; i++)
-                    for (int j = 0; j < renderers[i].materials.Length; j++)
-                    {
-                        Color targetColor = defaultColors[i+j];
-                        renderers[i].materials[j].SetColor("_EmissionColor", targetColor);
-                    }
-                yield break;
-            }
-
             for (int i = 0; i < fadeSmoothness; i++)
             {
                 float t = i / fadeSmoothness;
@@ -168,18 +157,6 @@ namespace GodUnityPlugin
             for (int i = 0; i < glowMats.Length; i++)
                 defaultColors[i] = glowMats[i].GetColor("_EmissionColor");
 
-            if (glowSpeed == 0.0f)
-            {
-                for (int j = 0; j < glowMats.Length; j++)
-                {
-                    Color targetColor = glowColor * maxIntensity;
-
-                    glowMats[j].SetColor("_EmissionColor", targetColor);
-                }
-
-                yield break;
-            }
-
             for (int i = 0; i < glowSmoothness; i++)
             {
                 float t = i / glowSmoothness;
@@ -191,6 +168,8 @@ namespace GodUnityPlugin
                     Color nextColor = Color.Lerp(defaultColors[j], targetColor, t);
 
                     glowMats[j].SetColor("_EmissionColor", nextColor);
+
+                    glowMats[j].color = Color.red;
                 }
 
                 yield return new WaitForSeconds(delay);
