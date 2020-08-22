@@ -56,6 +56,11 @@ namespace GodUnityPlugin
             yield return StartCoroutine(StartGlow(glowSpeed, maxIntensity, glowSmoothness, glowColor));
         }
 
+        public IEnumerator GlowAndFade()
+        {
+            yield return StartCoroutine(GlowAndFade(glowSpeed, maxIntensity, glowSmoothness, fadeSpeed, fadeSmoothness, glowColor));
+        }
+
         public IEnumerator GlowAndFade(Color color)
         {
             yield return StartCoroutine(GlowAndFade(glowSpeed, maxIntensity, glowSmoothness, fadeSpeed, fadeSmoothness, color));
