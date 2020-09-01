@@ -256,10 +256,10 @@ namespace GodUnityPlugin
             float yMin = cellCenter.y - (height / 2.0f);
             float yMax = cellCenter.y + (height / 2.0f);
 
-            Vector3 a = quaternionEuler * new Vector3(xMin, yMax);
-            Vector3 b = quaternionEuler * new Vector3(xMax, yMax);
-            Vector3 c = quaternionEuler * new Vector3(xMin, yMin);
-            Vector3 d = quaternionEuler * new Vector3(xMax, yMin);
+            Vector3 a = quaternionEuler * new Vector3(xMin, yMax, cellCenter.z);
+            Vector3 b = quaternionEuler * new Vector3(xMax, yMax, cellCenter.z);
+            Vector3 c = quaternionEuler * new Vector3(xMin, yMin, cellCenter.z);
+            Vector3 d = quaternionEuler * new Vector3(xMax, yMin, cellCenter.z);
 
             Vector3[] vertices = new Vector3[] { a,b,c,d };
 
@@ -420,7 +420,7 @@ namespace GodUnityPlugin
 
                     Gizmos.DrawLine(cell.vertices[0], cell.vertices[3]);
                     Gizmos.DrawLine(cell.vertices[1], cell.vertices[2]);
-                    Gizmos.DrawRay(CellArray[i][j].center, CellArray[i][j].normal * scale);
+                    Gizmos.DrawRay(cell.center, cell.normal * scale);
                 }
         }
 #endif
