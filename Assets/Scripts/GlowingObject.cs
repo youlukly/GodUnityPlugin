@@ -68,20 +68,11 @@ namespace GodUnityPlugin
 
         public IEnumerator GlowAndFade(float glowSpeed, float maxIntensity, float glowSmoothness, float fadeSpeed, float fadeSmoothness, Color color)
         {
-            int matCount = 0;
-
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                foreach (var renderer in renderers)
-                    matCount += renderer.materials.Length;
-            }
-
             if (defaultMats == null)
             {
-                defaultMats = new Material[matCount];
+                defaultMats = new Material[renderers.Length];
                 for (int i = 0; i < renderers.Length; i++)
-                    for (int j = 0; j < renderers[i].materials.Length; j++)
-                        defaultMats[i + j] = renderers[i].materials[j];
+                        defaultMats[i] = renderers[i].material;
             }
 
             yield return StartCoroutine(Glow(glowSpeed, maxIntensity, glowSmoothness, color));
@@ -105,23 +96,21 @@ namespace GodUnityPlugin
                 float t = i / fadeSmoothness;
 
                 for (int j = 0; j < renderers.Length; j++)
-                    for (int k = 0; k < renderers[j].materials.Length; k++)
-                    {
-                        Material glowMat = renderers[j].materials[k];
+                {
+                    Material glowMat = renderers[j].material;
 
-                        Color color = glowMat.GetColor("_EmissionColor");
+                    Color color = glowMat.GetColor("_EmissionColor");
 
-                        Color nextColor = Color.Lerp(color, defaultColors[j+k], t);
+                    Color nextColor = Color.Lerp(color, defaultColors[j], t);
 
-                        glowMat.SetColor("_EmissionColor", nextColor);
-                    }
+                    glowMat.SetColor("_EmissionColor", nextColor);
+                }
 
                 yield return new WaitForSeconds(delay);
             }
 
             for (int i = 0; i < renderers.Length; i++)
-                for (int j = 0; j < renderers[i].materials.Length; j++)
-                    renderers[i].materials[j] = defaultMats[i + j];
+                    renderers[i].material = defaultMats[i];
 
             if (onFinishFade != null)
                 onFinishFade.Invoke();
@@ -134,25 +123,14 @@ namespace GodUnityPlugin
             if (onStartGlow != null)
                 onStartGlow.Invoke();
 
-            int matCount = 0;
+            Material[] glowMats = new Material[renderers.Length];
 
             for (int i = 0; i < renderers.Length; i++)
             {
-                foreach (var renderer in renderers)
-                    matCount += renderer.materials.Length;
-            }
-
-            Material[] glowMats = new Material[matCount];
-
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                for (int j = 0; j < renderers[i].materials.Length; j++)
-                {
-                    Material mat = renderers[i].materials[j];
-                    Material glowMat = new Material(mat);
-                    glowMats[i+j] = glowMat;
-                    renderers[i].materials[j] = glowMat;
-                }
+                Material mat = renderers[i].material;
+                Material glowMat = new Material(mat);
+                glowMats[i] = glowMat;
+                renderers[i].material = glowMat;
             }
 
             float delay = glowSpeed / glowSmoothness;
