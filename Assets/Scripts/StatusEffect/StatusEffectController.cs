@@ -4,203 +4,182 @@ using UnityEngine;
 
 namespace GodUnityPlugin
 {
-    public class StatusEffectController : MonoBehaviour
+    public class StatusEffectController
     {
         public StatusEffectUnityEvent onStartEffect = new StatusEffectUnityEvent();
         public StatusEffectUnityEvent onUpdateEffect = new StatusEffectUnityEvent();
         public StatusEffectUnityEvent onFinishEffect = new StatusEffectUnityEvent();
 
         public float updateSpeedMult { get; set; } = 1.0f;
-        
-        protected List<StatusEffect> effects = new List<StatusEffect>();
-        protected Dictionary<StatusEffect, float> remainTimePairs = new Dictionary<StatusEffect, float>();
 
-        public void AddEffect(StatusEffect effect)
+        protected StatusEffect[] effects;
+        protected List<StatusEffect> currentEffects = new List<StatusEffect>();
+        protected Dictionary<string, float> remainTimePairs = new Dictionary<string, float>();
+
+        public StatusEffectController(params StatusEffect[] effects)
         {
-            if (effects.Contains(effect))
+            this.effects = effects;
+        }
+
+        public void ManualUpdate()
+        {
+            for (int i = 0; i < currentEffects.Count; i++)
+            {
+                StatusEffect effect = currentEffects[i];
+
+                effect.UpdateEffect();
+                if (onUpdateEffect != null)
+                    onUpdateEffect.Invoke(effect);
+
+                if (remainTimePairs.ContainsKey(effect.id))
+                {
+                    remainTimePairs[effect.id] -= Time.deltaTime * updateSpeedMult;
+
+                    if (remainTimePairs[effect.id] <= 0.0f)
+                        RemoveEffect(effect.id);
+                }
+            }
+        }
+
+        public void AddEffect(string id)
+        {
+            if (!Contains(id))
                 return;
 
-            effects.Add(effect);
+            StatusEffect effect = Get(id);
+
+            currentEffects.Add(effect);
             effect.StartEffect();
             if (onStartEffect != null)
                 onStartEffect.Invoke(effect);
         }
 
-        public void AddEffect(StatusEffect effect, float duration)
+        public void AddEffect(string id, float duration)
         {
-            if (effects.Contains(effect))
+            if (!Contains(id))
                 return;
 
-            AddEffect(effect);
+            AddEffect(id);
 
-            if (!remainTimePairs.ContainsKey(effect))
-                remainTimePairs.Add(effect, duration);
+            StatusEffect effect = Get(id);
+
+            if (!remainTimePairs.ContainsKey(effect.id))
+                remainTimePairs.Add(effect.id, duration);
             else
-                remainTimePairs[effect] = duration;
+                remainTimePairs[effect.id] = duration;
         }
 
-        public void SetDuration(StatusEffect effect, float duration)
+        public void SetDuration(string id, float duration)
         {
-            if (!IsEffectedBy(effect))
+            if (!IsEffectedBy(id))
                 return;
 
-            if (!remainTimePairs.ContainsKey(effect))
+            if (!remainTimePairs.ContainsKey(id))
                 return;
 
-            remainTimePairs[effect] = duration;
+            remainTimePairs[id] = duration;
         }
 
-        public void AddDuration(StatusEffect effect, float duration)
+        public void AddDuration(string id, float duration)
         {
-            if (!IsEffectedBy(effect))
+            if (!IsEffectedBy(id))
                 return;
 
-            if (!remainTimePairs.ContainsKey(effect))
+            if (!remainTimePairs.ContainsKey(id))
                 return;
 
-            remainTimePairs[effect] += duration;
+            remainTimePairs[id] += duration;
         }
 
-        public void RemoveEffect(StatusEffect effect)
+        public void RemoveEffect(string id)
         {
-            if (!IsEffectedBy(effect))
+            if (!IsEffectedBy(id))
                 return;
+
+            StatusEffect effect = GetCurrent(id);
 
             effect.FinishEffect();
-            ClearEffect(effect);
+            ClearEffect(id);
         }
 
         public void RemoveAllEffects()
         {
-            for (int i = 0; i < effects.Count; i++)
+            for (int i = 0; i < currentEffects.Count; i++)
             {
-                StatusEffect effect = effects[i];
+                StatusEffect effect = currentEffects[i];
                 effect.FinishEffect();
             }
 
             ClearAllEffects();
         }
 
-        public void RemoveAllEffects<T>() where T : StatusEffect
-        {
-            if (!IsEffectedBy<T>())
-                return;
-
-            List<StatusEffect> removes = new List<StatusEffect>();
-
-            for (int i = 0; i < effects.Count; i++)
-            {
-                if (!effects[i].GetType().Equals(typeof(T)))
-                    continue;
-
-                removes.Add(effects[i]);
-            }
-
-            foreach (var remove in removes)
-                RemoveEffect(remove);
-
-            removes.Clear();
-        }
-
-        public void ClearAllEffects<T>() where T : StatusEffect
-        {
-            if (!IsEffectedBy<T>())
-                return;
-
-            List<StatusEffect> removes = new List<StatusEffect>();
-
-            for (int i = 0; i < effects.Count; i++)
-            {
-                if (!effects[i].GetType().Equals(typeof(T)))
-                    continue;
-
-                removes.Add(effects[i]);
-            }
-
-            foreach (var remove in removes)
-                ClearEffect(remove);
-
-            removes.Clear();
-        }
-
         public void ClearAllEffects()
         {
-            effects.Clear();
+            currentEffects.Clear();
             remainTimePairs.Clear();
         }
 
-        public bool IsEffectedBy(StatusEffect effect)
+        public bool IsEffectedBy(string id)
         {
-            return effects.Contains(effect);
-        }
-
-        public bool IsEffectedBy<T>() where T : StatusEffect
-        {
-            foreach (var effect in effects)
+            foreach (var statusEffect in currentEffects)
             {
-                if (!effect.GetType().Equals(typeof(T)))
-                    continue;
-
-                return true;
+                if (statusEffect.id == id)
+                    return true;
             }
 
             return false;
         }
 
-        public List<T> GetActiveEffects<T>() where T : StatusEffect
+        public StatusEffect GetCurrent(string id)
         {
-            List<T> results = new List<T>();
-
-            foreach (var effect in effects)
+            foreach (var statusEffect in currentEffects)
             {
-                if (!effect.GetType().Equals(typeof(T)))
-                    continue;
-
-                T result = effect as T;
-
-                results.Add(result);
+                if (statusEffect.id == id)
+                    return statusEffect;
             }
 
-            return results;
+            return null;
         }
 
-        public float GetRemain(StatusEffect effect)
+        public float GetRemain(string id)
         {
-            if (!IsEffectedBy(effect) || !remainTimePairs.ContainsKey(effect))
+            if (!IsEffectedBy(id) || !remainTimePairs.ContainsKey(id))
                 return 0f;
 
-            return remainTimePairs[effect];
+            return remainTimePairs[id];
         }
-
-        private void Update()
+        
+        private StatusEffect Get(string id)
         {
-            for (int i = 0; i < effects.Count; i++)
+            foreach (var statusEffect in effects)
             {
-                StatusEffect effect = effects[i];
-
-                effect.UpdateEffect();
-                if (onUpdateEffect != null)
-                    onUpdateEffect.Invoke(effect);
-
-                if (remainTimePairs.ContainsKey(effect))
-                {
-                    remainTimePairs[effect] -= Time.deltaTime * updateSpeedMult;
-
-                    if(remainTimePairs[effect] <= 0.0f)
-                        RemoveEffect(effect);
-                }
+                if (statusEffect.id == id)
+                    return statusEffect;
             }
+
+            return null;
         }
 
-        private void ClearEffect(StatusEffect effect)
+        private void ClearEffect(string id)
         {
-            if (!IsEffectedBy(effect))
+            if (!IsEffectedBy(id))
                 return;
 
-            if (remainTimePairs.ContainsKey(effect))
-                remainTimePairs.Remove(effect);
+            if (remainTimePairs.ContainsKey(id))
+                remainTimePairs.Remove(id);
 
-            effects.Remove(effect);
+            currentEffects.Remove(GetCurrent(id));
+        }
+
+        private bool Contains(string id)
+        {
+            foreach (var statusEffect in effects)
+            {
+                if (statusEffect.id == id)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

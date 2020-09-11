@@ -6,6 +6,8 @@ namespace GodUnityPlugin
 {
     public abstract class StatusEffect
     {
+        public abstract string id { get; }
+
         public void StartEffect()
         {
             OnStartEffect();
