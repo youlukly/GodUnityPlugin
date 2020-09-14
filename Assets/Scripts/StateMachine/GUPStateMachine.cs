@@ -4,18 +4,23 @@ using UnityEngine;
 
 namespace GodUnityPlugin
 {
-    public class GUPStateMachine : MonoBehaviour
+    public class GUPStateMachine
     {
         private List<IGUPState> states = new List<IGUPState>();
 
         public IGUPState current { get; private set; }
 
-        public void Init(List<IGUPState> states)
+        public GUPStateMachine()
+        {
+
+        }
+
+        public GUPStateMachine(List<IGUPState> states)
         {
             this.states = states;
         }
 
-        public void Init(List<IGUPState> states, string initState)
+        public GUPStateMachine(List<IGUPState> states, string initState)
         {
             this.states = states;
             TransitionToState(initState);
@@ -68,7 +73,7 @@ namespace GodUnityPlugin
             current.OnEnter();
         }
 
-        protected virtual void Update()
+        public virtual void ManualUpdate()
         {
             if (current == null)
                 return;
@@ -84,7 +89,7 @@ namespace GodUnityPlugin
             }
         }
 
-        protected virtual void LateUpdate()
+        public virtual void ManualLateUpdate()
         {
             if (current == null)
                 return;
@@ -92,7 +97,7 @@ namespace GodUnityPlugin
             current.OnLateUpdate();
         }
 
-        protected virtual void FixedUpdate()
+        public virtual void ManualFixedUpdate()
         {
             if (current == null)
                 return;

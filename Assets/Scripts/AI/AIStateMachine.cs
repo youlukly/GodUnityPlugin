@@ -181,9 +181,9 @@ namespace GodUnityPlugin
                 pattern.DeRegisterLateUpdateEvent(call);
         }
 
-        protected override void Update()
+        public override void ManualUpdate()
         {
-            base.Update();
+            base.ManualUpdate();
             foreach (var pattern in currentPriority)
             {
                 if (pattern.Key.isRunning)
@@ -347,20 +347,5 @@ namespace GodUnityPlugin
 
             currentPriority[pattern] = p;
         }
-
-#if UNITY_EDITOR
-
-        private void OnDrawGizmosSelected()
-        {
-            if (!log)
-                return;
-
-            if (current != null && current.id != null && current.id != "")
-                Handles.Label(transform.position, "Pattern : " + current.id);
-            else
-                Handles.Label(transform.position, "Pattern : null");
-        }
-
-#endif
     }
 }

@@ -99,6 +99,8 @@ namespace GodUnityPlugin
             StatusEffect effect = GetCurrent(id);
 
             effect.FinishEffect();
+            if (onFinishEffect != null)
+                onFinishEffect.Invoke(effect);
             ClearEffect(id);
         }
 
@@ -108,6 +110,8 @@ namespace GodUnityPlugin
             {
                 StatusEffect effect = currentEffects[i];
                 effect.FinishEffect();
+                if (onFinishEffect != null)
+                    onFinishEffect.Invoke(effect);
             }
 
             ClearAllEffects();
