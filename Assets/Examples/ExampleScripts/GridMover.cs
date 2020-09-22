@@ -38,7 +38,7 @@ namespace GodUnityPlugin.Examples
         {
             GridCell cell;
 
-            if (grid.IsInCell(point, out cell))
+            if (grid.IsInGrid(point, out cell))
                 SetGameObjectPosToCell(cell);
             else
                 SetGameObjectPosToOrigin();
