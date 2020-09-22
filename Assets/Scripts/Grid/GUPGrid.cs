@@ -26,6 +26,8 @@ namespace GodUnityPlugin
         // array of the grid cells
         public GridCell[][] CellArray { get; private set; }
 
+        public int[][] ignoreList { get; private set; }
+
         public float Scale { get { return Mathf.Abs(scale); } }
 
         public int Count { get { return Row * Column; } }
@@ -185,7 +187,7 @@ namespace GodUnityPlugin
         }
 
         // check if a vector is in grid matrix
-        public bool IsInCell(Vector3 point,out GridCell cell)
+        public bool IsInGrid(Vector3 point,out GridCell cell)
         {
             cell = new GridCell();
 
@@ -205,6 +207,11 @@ namespace GodUnityPlugin
             }
 
             return false;
+        }
+
+        public void IgnoreCells(int[][] indices)
+        {
+            ignoreList = indices;
         }
 
         // recalculate cell matrix data

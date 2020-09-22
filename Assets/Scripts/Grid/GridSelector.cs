@@ -179,7 +179,7 @@ namespace GodUnityPlugin
             if (!CheckGridPoint(hits, out point))
                 return false;
 
-            return grid.IsInCell(point, out cell);
+            return grid.IsInGrid(point, out cell);
         }
 
         private bool CheckGridPoint(RaycastHit[] hits, out Vector3 point)
