@@ -471,6 +471,7 @@ namespace GodUnityPlugin
                     Gizmos.DrawLine(cell.vertices[0], cell.vertices[3]);
                     Gizmos.DrawLine(cell.vertices[1], cell.vertices[2]);
                     Gizmos.DrawRay(cell.center, cell.normal * scale);
+                    UnityEditor.Handles.Label(cell.center,cell.id);
                 }
         }
 #endif
