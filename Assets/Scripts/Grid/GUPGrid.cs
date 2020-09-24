@@ -17,7 +17,7 @@ namespace GodUnityPlugin
         [SerializeField] private float cellWidth = 5f;
         [SerializeField] private float cellHeight = 5f;
         [SerializeField] private string cellName = "Cell";
-        [SerializeField] private int[] ignoreIndices;
+        [SerializeField] private IndependentGridCell[] independentGridCells;
 
         [Space(10)]
         [Header("Gizmos")]
@@ -50,9 +50,6 @@ namespace GodUnityPlugin
         {
             get
             {
-                if (row == 0)
-                    row = 1;
-
                 return Mathf.Abs(row);
             }
         }
@@ -62,9 +59,6 @@ namespace GodUnityPlugin
         {
             get
             {
-                if (column == 0)
-                    column = 1;
-
                 return Mathf.Abs(column);
             }
         }
@@ -102,9 +96,6 @@ namespace GodUnityPlugin
             {
                 for (int j = 0; j < Row; j++)
                 {
-                    if (IsIgnoringCell(i + j))
-                        continue;
-
                     GridCell gridCell = CellArray[i][j];
 
                     if (CompareCell(gridCell,cell))
@@ -128,9 +119,6 @@ namespace GodUnityPlugin
             {
                 for (int j = 0; j < Row; j++)
                 {
-                    if (IsIgnoringCell(i+j))
-                        continue;
-
                     GridCell gridCell = CellArray[i][j];
 
                     if (gridCell.id == id)
@@ -149,9 +137,6 @@ namespace GodUnityPlugin
         {
             cell = new GridCell();
 
-            if (IsIgnoringCell(index))
-                return false;
-
             if (index > Count || index < 0)
                 return false;
 
@@ -166,9 +151,6 @@ namespace GodUnityPlugin
         public bool TryGet(GridCell cell, out int index)
         {
             index = 0;
-
-            if (IsIgnoringCell(index))
-                return false;
 
             for (int i = 0; i < Column; i++)
             {
@@ -190,9 +172,6 @@ namespace GodUnityPlugin
         {
             cell = new GridCell();
 
-            if (IsIgnoringCell(row + column))
-                return false;
-
             if (row < 0 || column < 0 || column > CellArray.Length-1 || row > CellArray[0].Length-1)
                 return false;
 
@@ -209,17 +188,26 @@ namespace GodUnityPlugin
             {
                 for (int j = 0; j < Row; j++)
                 {
-                    if (IsIgnoringCell(i + j))
-                        continue;
-
                     GridCell current = CellArray[i][j];
 
-                    if (IsInCell(point,current))
+                    if (current.IsInCell(point))
                     {
                         cell = current;
 
                         return true;
                     }
+                }
+            }
+
+            if (independentGridCells == null || independentGridCells.Length == 0)
+                return false;
+
+            foreach (var independentCell in independentGridCells)
+            {
+                if(independentCell.IsInCell(point))
+                {
+                    cell = independentCell.GetCell();
+                    return true;
                 }
             }
 
@@ -235,9 +223,6 @@ namespace GodUnityPlugin
             {
                 for (int j = 0; j < Row; j++)
                 {
-                    if (IsIgnoringCell(i + j))
-                        continue;
-
                     //calibrate by rotation
                     Vector3 cellCenter = GetCellCenter(i, j);
 
@@ -249,17 +234,6 @@ namespace GodUnityPlugin
                     CellArray[i][j] = new GridCell(name, cellCenter,normal,GetCellVertices(i,j, CellWidth,CellHeight),quaternionEuler, CellWidth, CellHeight, j, i);
                 }
             }
-        }
-
-        public void UpdateCellMatrix(int[] ignoreIndices)
-        {
-            IgnoreCells(ignoreIndices);
-            UpdateCellMatrix();
-        }
-
-        public void IgnoreCells(int[] ignoreIndices)
-        {
-            this.ignoreIndices = ignoreIndices;
         }
 
         // compare two cell values
@@ -334,19 +308,6 @@ namespace GodUnityPlugin
             return vertices;
         }
 
-        // check if a vector is in cell element
-        private bool IsInCell(Vector3 point,GridCell cell)
-        {
-            Vector3[] vertices = GetCellVertices(cell.columnIndex,cell.rowIndex,cell.width,cell.height);
-
-            Vector3 a = vertices[0];
-            Vector3 b = vertices[1];
-            Vector3 c = vertices[2];
-            Vector3 d = vertices[3];
-
-            return GUPMath.IsVertexInRectangle(a,b,c,d,point);
-        }
-
         // uncalibrated center of the cell 
         private Vector3 GetCellCenterRaw(int columnIndex, int rowIndex)
         {
@@ -365,20 +326,6 @@ namespace GodUnityPlugin
         private Vector3 GetCellCenter(int columnIndex, int rowIndex)
         {
             return quaternionEuler * GetCellCenterRaw(columnIndex,rowIndex);
-        }
-
-        private bool IsIgnoringCell(int index)
-        {
-            if (ignoreIndices == null || ignoreIndices.Length <= 0)
-                return false;
-
-            foreach (var ignore in ignoreIndices)
-            {
-                if (ignore == index)
-                    return true;
-            }
-
-            return false;
         }
 
         // rename + centre the gameobject upon first time dragging the script into the editor. 
@@ -463,9 +410,6 @@ namespace GodUnityPlugin
             for (int i = 0; i < CellArray.Length; i++)
                 for (int j = 0; j < CellArray[i].Length; j++)
                 {
-                    if (IsIgnoringCell(i + j))
-                        continue;
-
                     GridCell cell = CellArray[i][j];
 
                     Gizmos.DrawLine(cell.vertices[0], cell.vertices[3]);

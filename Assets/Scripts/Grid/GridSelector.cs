@@ -2,76 +2,49 @@
 
 namespace GodUnityPlugin
 {
-    [RequireComponent(typeof(GUPGrid))]
-    public class GridSelector : MonoBehaviour
+    public class GridSelector 
     {
-        public new Camera camera;
-        public bool allowInput = true;
-        public bool autoSynchronize = false;
-
         // grid cell unity events, respond with user input
-        [Header("Events")]
-        public GridCellUnityEvent onDownCell;
-        public Vector3UnityEvent onDown;
-        public GridCellUnityEvent onDragCell;
-        public Vector3UnityEvent onDrag;
-        public GridCellUnityEvent onUpCell;
-        public Vector3UnityEvent onUp;
-        public GridCellUnityEvent onOverCell;
-        public Vector3UnityEvent onOver;
-        
-        [Header("Gizmos")]
-        [SerializeField] private bool drawGizmos = true;
+        public GridCellUnityEvent onDownCell = new GridCellUnityEvent();
+        public Vector3UnityEvent onDown = new Vector3UnityEvent();
+        public GridCellUnityEvent onDragCell = new GridCellUnityEvent();
+        public Vector3UnityEvent onDrag = new Vector3UnityEvent();
+        public GridCellUnityEvent onUpCell = new GridCellUnityEvent();
+        public Vector3UnityEvent onUp = new Vector3UnityEvent();
+        public GridCellUnityEvent onOverCell = new GridCellUnityEvent();
+        public Vector3UnityEvent onOver = new Vector3UnityEvent();
+
+        public bool drawGizmos = true;
         public Color gizmoDownColor = Color.green;
         public Color gizmoDragColor = Color.yellow;
         public Color gizmoUpColor = Color.white;
         public Color gizmoOverColor = Color.gray;
         public Color gizmoFailColor = Color.red;
 
-        private BoxCollider gridBox;
+        private Camera camera;
+        private BoxCollider boxCollider;
 
-        public GUPGrid grid { get; private set; }
+        private GUPGrid grid;
+
+        public GridSelector(GUPGrid grid,BoxCollider boxCollider,Camera camera)
+        {
+            this.grid = grid;
+
+            this.boxCollider = boxCollider;
+
+            this.camera = camera;
+        }
 
         public void SynchronizeCollider()
         {
             Bounds bounds = new Bounds(grid.Center, new Vector2(grid.Width, grid.Height));
 
-            gridBox.size = bounds.size;
+            boxCollider.size = bounds.size;
+            boxCollider.isTrigger = true;
         }
 
-        private void Awake()
+        public void ManualUpdate()
         {
-            grid = GetComponent<GUPGrid>();
-
-            gridBox = GetComponent<BoxCollider>();
-            if (gridBox == null)
-            {
-                gridBox = gameObject.AddComponent<BoxCollider>();
-                gridBox.isTrigger = true;
-                SynchronizeCollider();
-            }
-        }
-
-        private void Update()
-        {
-            if (!allowInput)
-                return;
-
-            if (!camera)
-            {
-                camera = FindObjectOfType<Camera>();
-
-                if (!camera)
-                {
-                    Debug.LogWarning("no active camera detected!!!!");
-                    allowInput = false;
-                    return;
-                }
-            }
-
-            if (autoSynchronize)
-                SynchronizeCollider();
-
             GridCell selected;
             Vector3 point;
 
@@ -188,7 +161,7 @@ namespace GodUnityPlugin
 
             foreach (RaycastHit hit in hits)
             {
-                if (hit.collider != null && hit.collider == gridBox)
+                if (hit.collider != null && hit.collider == boxCollider)
                 {
                     point = hit.point;
                     return true;
