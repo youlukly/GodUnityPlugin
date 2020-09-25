@@ -116,6 +116,11 @@ namespace GodUnityPlugin
 
             Gizmos.color = Color.Lerp(Color.black, gizmoLineColor, 0.4f);
 
+            Gizmos.DrawLine(cell.vertices[0], cell.vertices[1]);
+            Gizmos.DrawLine(cell.vertices[1], cell.vertices[3]);
+            Gizmos.DrawLine(cell.vertices[3], cell.vertices[2]);
+            Gizmos.DrawLine(cell.vertices[2], cell.vertices[0]);
+
             Gizmos.DrawLine(cell.vertices[0], cell.vertices[3]);
             Gizmos.DrawLine(cell.vertices[1], cell.vertices[2]);
             Gizmos.DrawRay(cell.center, cell.normal);
