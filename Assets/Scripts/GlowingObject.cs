@@ -140,19 +140,18 @@ namespace GodUnityPlugin
             for (int i = 0; i < glowMats.Length; i++)
                 defaultColors[i] = glowMats[i].GetColor("_EmissionColor");
 
+            Color targetColor = glowColor * maxIntensity;
+
             for (int i = 0; i < glowSmoothness; i++)
             {
                 float t = i / glowSmoothness;
 
                 for (int j = 0; j < glowMats.Length; j++)
                 {
-                    Color targetColor = glowColor * maxIntensity;
-
                     Color nextColor = Color.Lerp(defaultColors[j], targetColor, t);
 
                     glowMats[j].SetColor("_EmissionColor", nextColor);
-
-                    glowMats[j].color = Color.red;
+                    renderers[j].material = glowMats[j];
                 }
 
                 yield return new WaitForSeconds(delay);
