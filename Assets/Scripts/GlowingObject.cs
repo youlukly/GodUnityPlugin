@@ -129,8 +129,10 @@ namespace GodUnityPlugin
             {
                 Material mat = renderers[i].material;
                 Material glowMat = new Material(mat);
+                glowMat.EnableKeyword("_EmissionColor");
                 glowMats[i] = glowMat;
                 renderers[i].material = glowMat;
+                renderers[i].material.EnableKeyword("_EmissionColor");
             }
 
             float delay = glowSpeed / glowSmoothness;
@@ -151,7 +153,6 @@ namespace GodUnityPlugin
                     Color nextColor = Color.Lerp(defaultColors[j], targetColor, t);
 
                     glowMats[j].SetColor("_EmissionColor", nextColor);
-                    renderers[j].material = glowMats[j];
                 }
 
                 yield return new WaitForSeconds(delay);
