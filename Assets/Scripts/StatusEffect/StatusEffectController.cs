@@ -145,7 +145,7 @@ namespace GodUnityPlugin
             return null;
         }
 
-        public float GetRemain(string id)
+        public float GetDuration(string id)
         {
             if (!IsEffectedBy(id) || !remainTimePairs.ContainsKey(id))
                 return 0f;
