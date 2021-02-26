@@ -41,7 +41,7 @@ namespace GodUnityPlugin
 
         public static float PercentToValue(float percent, float reference)
         {
-            return (reference * (percent / 100f));
+            return (reference * (percent * 0.01f));
         }
 
         public static float ValueToPercent(float value, float reference)
