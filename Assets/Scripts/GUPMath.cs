@@ -10,6 +10,7 @@ namespace GodUnityPlugin
         {
             chance = Mathf.Clamp(chance, 0,100.0f);
 
+            Random.InitState(System.DateTime.Now.Millisecond);
             float ran = Random.Range(0, 100.0f);
 
             return ran <= chance;
