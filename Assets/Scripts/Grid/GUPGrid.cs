@@ -86,6 +86,11 @@ namespace GodUnityPlugin
   
         private Vector3 calibratedCenter { get { return Quaternion.Inverse(quaternionEuler)* Center;  } }
 
+        public IndependentGridCell[] GetIndependentGridCells()
+        {
+            return independentGridCells;
+        }
+
         // returns the index that matches the Cell
         public bool TryGet(GridCell cell, out int row, out int column)
         {
