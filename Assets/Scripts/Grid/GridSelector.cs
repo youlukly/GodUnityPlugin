@@ -48,7 +48,12 @@ namespace GodUnityPlugin
             GridCell selected;
             Vector3 point;
 
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            Vector3 mousePos = Input.mousePosition;
+
+            if (camera.orthographicSize == 0 && IsInFrustum(camera,mousePos))
+                return;
+
+            Ray ray = camera.ScreenPointToRay(mousePos);
             RaycastHit[] hits = Physics.RaycastAll(ray);
 
             bool isInCell = false;
@@ -174,6 +179,17 @@ namespace GodUnityPlugin
         private void OnSelect(GridCell cell)
         {
             Debug.Log("select cell : name [" + cell.id + "], matrix [" + cell.columnIndex + "], [" + cell.rowIndex + "]");
+        }
+
+        private bool IsInFrustum(Camera camera,Vector3 position)
+        {
+            var planes = GeometryUtility.CalculateFrustumPlanes(camera);
+            foreach (var plane in planes)
+            {
+                if (plane.GetDistanceToPoint(position) < 0)
+                    return false;
+            }
+            return true;
         }
 
 #if UNITY_EDITOR
