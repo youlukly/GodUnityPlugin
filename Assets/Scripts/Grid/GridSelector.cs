@@ -50,10 +50,7 @@ namespace GodUnityPlugin
 
             Vector3 mousePos = Input.mousePosition;
 
-            if (camera.orthographicSize == 0 && IsInFrustum(camera,mousePos))
-                return;
-
-            Ray ray = camera.ScreenPointToRay(mousePos);
+            Ray ray = camera.ScreenPointToRay(mousePos); 
             RaycastHit[] hits = Physics.RaycastAll(ray);
 
             bool isInCell = false;
