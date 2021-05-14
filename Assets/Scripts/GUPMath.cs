@@ -256,6 +256,11 @@ namespace GodUnityPlugin
             return (point - origin).sqrMagnitude <= (range * range);
         }
 
+        public static bool IsInRange(Vector3 origin,Vector3 point,float range)
+        {
+            return (point - origin).sqrMagnitude <= (range * range);
+        }
+
         public static Vector2 ClampDirection(Vector2 origin, Vector2 point, float angle, Vector2 baseDirection)
         {
             Vector2 result = (point - origin).normalized;
