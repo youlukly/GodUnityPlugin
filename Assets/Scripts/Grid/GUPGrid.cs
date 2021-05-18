@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace GodUnityPlugin
 {
@@ -18,14 +19,29 @@ namespace GodUnityPlugin
         [SerializeField] private float cellHeight = 5f;
         [SerializeField] private string cellName = "Cell";
         [SerializeField] private IndependentGridCell[] independentGridCells;
+        [SerializeField] private List<int> ignoreCellIndices = new List<int>();
 
         [Space(10)]
         [Header("Gizmos")]
         [SerializeField] private bool drawGizmos = true;
+        [SerializeField] private bool drawCellName = true;
+        [SerializeField] private bool drawCellLines = true;
+        [SerializeField] private int cellLineCount = 2;
+        [SerializeField] private bool drawNormal = true;
+        [SerializeField] private bool drawVertex = true;
         [SerializeField] private Color gizmoLineColor = new Color(0.25f, 0.1f, 0.25f, 1f);
 
         // array of the grid cells
-        public GridCell[][] CellArray { get; private set; }
+        public GridCell[][] CellArray 
+        {
+            get
+            {
+                if (_cellArray == null)
+                    UpdateCellMatrix();
+
+                return _cellArray;
+            }
+        }
 
         public float Scale { get { return Mathf.Abs(scale); } }
 
@@ -86,6 +102,8 @@ namespace GodUnityPlugin
   
         private Vector3 calibratedCenter { get { return Quaternion.Inverse(quaternionEuler)* Center;  } }
 
+        private GridCell[][] _cellArray;
+
         public IndependentGridCell[] GetIndependentGridCells()
         {
             return independentGridCells;
@@ -145,28 +163,22 @@ namespace GodUnityPlugin
             if (index > Count || index < 0)
                 return false;
 
-            int column = GUPMath.Quotient(index, Column);
-
-            int row = index % Row;
-
-            cell = CellArray[column][row];
-            return true;
-        }
-
-        public bool TryGet(GridCell cell, out int index)
-        {
-            index = 0;
+            foreach (var ignore in ignoreCellIndices)
+            {
+                if (ignore == index)
+                    return false;
+            }
 
             for (int i = 0; i < Column; i++)
             {
                 for (int j = 0; j < Row; j++)
                 {
                     GridCell gridCell = CellArray[i][j];
-
-                    if (CompareCell(cell,gridCell))
+                    if (gridCell.index == index)
+                    {
+                        cell = gridCell;
                         return true;
-
-                    index++;
+                    }
                 }
             }
 
@@ -195,6 +207,12 @@ namespace GodUnityPlugin
                 {
                     GridCell current = CellArray[i][j];
 
+                    foreach (var ignore in ignoreCellIndices)
+                    {
+                        if (ignore == current.index)
+                            return false;
+                    }
+
                     if (current.IsInCell(point))
                     {
                         cell = current;
@@ -204,17 +222,54 @@ namespace GodUnityPlugin
                 }
             }
 
-            if (independentGridCells == null || independentGridCells.Length == 0)
-                return false;
-
-            foreach (var independentCell in independentGridCells)
-            {
-                if(independentCell.IsInCell(point))
+            if (independentGridCells != null )
+                foreach (var independentCell in independentGridCells)
                 {
-                    cell = independentCell.GetCell();
-                    return true;
+                    if (independentCell.IsInCell(point))
+                    {
+                        cell = independentCell.GetCell();
+                        return true;
+                    }
+                }
+
+            return false;
+        }
+
+        public bool IsInGrid(Vector3 point, out GridCell cell,bool calculateIgnore = true)
+        {
+            cell = new GridCell();
+
+            for (int i = 0; i < Column; i++)
+            {
+                for (int j = 0; j < Row; j++)
+                {
+                    GridCell current = CellArray[i][j];
+
+                    if(calculateIgnore)
+                    foreach (var ignore in ignoreCellIndices)
+                    {
+                        if (ignore == current.index)
+                            return false;
+                    }
+
+                    if (current.IsInCell(point))
+                    {
+                        cell = current;
+
+                        return true;
+                    }
                 }
             }
+
+            if (independentGridCells != null)
+                foreach (var independentCell in independentGridCells)
+                {
+                    if (independentCell.IsInCell(point))
+                    {
+                        cell = independentCell.GetCell();
+                        return true;
+                    }
+                }
 
             return false;
         }
@@ -236,7 +291,7 @@ namespace GodUnityPlugin
 
                     string name = cellName + " " + index;
 
-                    CellArray[i][j] = new GridCell(name, cellCenter,normal,GetCellVertices(i,j, CellWidth,CellHeight),quaternionEuler, CellWidth, CellHeight, j, i);
+                    CellArray[i][j] = new GridCell(name, cellCenter,normal,GetCellVertices(i,j, CellWidth,CellHeight),quaternionEuler, CellWidth, CellHeight,index , j, i);
                 }
             }
         }
@@ -251,6 +306,38 @@ namespace GodUnityPlugin
             x.width == y.width &&
             x.id == y.id &&
             x.normal == y.normal;
+        }
+
+        public void SetIgnoreCellIndices(List<int> indices)
+        {
+            ignoreCellIndices = indices;   
+        }
+
+        public void AddIgnoreCellIndices(int index)
+        {
+            if (ignoreCellIndices == null)
+            {
+                ignoreCellIndices = new List<int>();
+                ignoreCellIndices.Add(index);
+                return;
+            }
+
+            if (!ignoreCellIndices.Contains(index))
+                ignoreCellIndices.Add(index);
+        }
+
+        public void RemoveIgnoreCellIndices(int index)
+        {
+            if (ignoreCellIndices == null)
+                return;
+
+            if (ignoreCellIndices.Contains(index))
+                ignoreCellIndices.Remove(index);
+        }
+
+        public List<int> GetIgnoreCellIndices()
+        {
+            return ignoreCellIndices;
         }
 
         private void Awake()
@@ -340,14 +427,21 @@ namespace GodUnityPlugin
                 name = "Grid";
 
             transform.position = Vector3.zero;
+
+            UpdateCellMatrix();
+        }
+
+        private void OnValidate()
+        {
+            UpdateCellMatrix();
         }
 
         // initialize cell array
         private void InitializeArray()
         {
-            CellArray = new GridCell[Column][];
-            for (int i = 0; i < CellArray.Length; i++)
-                CellArray[i] = new GridCell[Row];
+            _cellArray = new GridCell[Column][];
+            for (int i = 0; i < _cellArray.Length; i++)
+                _cellArray[i] = new GridCell[Row];
         }
 
 #if UNITY_EDITOR
@@ -402,12 +496,16 @@ namespace GodUnityPlugin
 
             Vector3 dir = normal * range;
 
-            Gizmos.color = Color.Lerp(Color.black, gizmoLineColor, 0.4f);
+            if (drawNormal)
+            {
+                Gizmos.color = Color.Lerp(Color.black, gizmoLineColor, 0.4f);
 
-            Gizmos.DrawLine(Center,Center+dir);
+                Gizmos.DrawLine(Center, Center + dir);
+            }
 
-            for (int i = 0; i < vertices.Length; i++)
-                Gizmos.DrawSphere(vertices[i], range * 0.1f);
+            if (drawVertex)
+                for (int i = 0; i < vertices.Length; i++)
+                    Gizmos.DrawSphere(vertices[i], range * 0.1f);
 
             if (CellArray == null || CellArray.Length == 0)
                 return;
@@ -415,12 +513,75 @@ namespace GodUnityPlugin
             for (int i = 0; i < CellArray.Length; i++)
                 for (int j = 0; j < CellArray[i].Length; j++)
                 {
+                    bool ignore = false;
                     GridCell cell = CellArray[i][j];
 
-                    Gizmos.DrawLine(cell.vertices[0], cell.vertices[3]);
-                    Gizmos.DrawLine(cell.vertices[1], cell.vertices[2]);
-                    Gizmos.DrawRay(cell.center, cell.normal * scale);
-                    UnityEditor.Handles.Label(cell.center,cell.id);
+                    foreach (var index in ignoreCellIndices)
+                    {
+                        if (index == cell.index)
+                        {
+                            ignore = true;
+                            break;
+                        }
+                    }
+
+                    if (ignore)
+                        Gizmos.color = Color.Lerp(Color.red, gizmoLineColor, 0.2f);
+                    else
+                        Gizmos.color = Color.Lerp(Color.blue, gizmoLineColor, 0.2f);
+
+                    if (drawCellLines)
+                    {
+                        Gizmos.DrawLine(cell.vertices[0], cell.vertices[3]);
+                        Gizmos.DrawLine(cell.vertices[1], cell.vertices[2]);
+
+                        for (int l = 0; l < cell.vertices.Length; l++)
+                        {
+                            int next1 = 0;
+                            int next2 = 0;
+
+                            switch (l)
+                            {
+                                case 0:
+                                    next1 = 1;
+                                    next2 = 3;
+                                    break;
+                                case 1:
+                                    next1 = 3;
+                                    next2 = 2;
+                                    break;
+                                case 2:
+                                    next1 = 0;
+                                    next2 = 1;
+                                    break;
+                                case 3:
+                                    next1 = 2;
+                                    next2 = 0;
+                                    break;
+                            }
+
+                            Vector3 a = cell.vertices[l];
+                            Vector3 b = cell.vertices[next1];
+                            Vector3 c = cell.vertices[next2];
+
+                            Vector3 ab = (b - a) / (cellLineCount + 1);
+                            Vector3 cb = (b - c) / (cellLineCount + 1);
+
+                            for (int k = 1; k < cellLineCount; k++)
+                            {
+                                Vector3 from = a + (ab * k);
+                                Vector3 to = c + (cb * k);
+
+                                Gizmos.DrawLine(from, to);
+                            }
+                        }
+                    }
+
+                    if (drawNormal)
+                        Gizmos.DrawRay(cell.center, cell.normal * scale);
+
+                    if (drawCellName)
+                        UnityEditor.Handles.Label(cell.center, cell.id);
                 }
         }
 #endif

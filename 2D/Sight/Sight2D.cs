@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GodUnityPlugin
 {
-    [CreateAssetMenu(menuName = "Sight2D")]
+    [CreateAssetMenu(menuName = "GodUnityPlugin/Sight2D/Sight2D")]
     public class Sight2D : ScriptableObject
     {
         public float range;

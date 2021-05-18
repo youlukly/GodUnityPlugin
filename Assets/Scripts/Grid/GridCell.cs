@@ -11,9 +11,10 @@ namespace GodUnityPlugin
         public Vector3[] vertices;
         public Quaternion eulerAngle;
         public float width,height;
+        public int index;
         public int rowIndex, columnIndex;
 
-        public GridCell(string id, Vector3 center,Vector3 normal,Vector3[] vertices,Quaternion euler,float width, float height, int rowIndex, int columnIndex)
+        public GridCell(string id, Vector3 center,Vector3 normal,Vector3[] vertices,Quaternion euler,float width, float height,int index,int rowIndex, int columnIndex)
         {
             this.id = id;
             this.center = center;
@@ -22,6 +23,7 @@ namespace GodUnityPlugin
             this.eulerAngle = euler;
             this.width = width;
             this.height = height;
+            this.index = index;
             this.rowIndex = rowIndex;
             this.columnIndex = columnIndex;
         }
