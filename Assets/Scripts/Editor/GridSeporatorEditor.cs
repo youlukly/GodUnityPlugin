@@ -26,8 +26,13 @@ namespace GodUnityPlugin
 
                 if (CheckGridCell(seperator, hits, out selected))
                 {
-                    Debug.Log("added ignore cell : " + selected.id);
-                    seperator.AddIgnoreCellIndices(selected.index);
+                    string id = seperator.GetCurrentGroupName();
+
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        Debug.Log("added cell : " + selected.id + " to group : " + id);
+                        seperator.AddIgnoreCellIndices(id,selected.index);
+                    }
                 }
             }
             else if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.R)
@@ -40,9 +45,18 @@ namespace GodUnityPlugin
 
                 if (CheckGridCell(seperator, hits, out selected))
                 {
-                    Debug.Log("removed ignore cell : " + selected.id);
-                    seperator.RemoveIgnoreCellIndices(selected.index);
+                    string id = seperator.GetCurrentGroupName();
+
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        Debug.Log("remove cell : " + selected.id + " from group : " + id);
+                        seperator.RemoveIgnoreCellIndices(id,selected.index);
+                    }
                 }
+            }
+            else if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.N)
+            {
+                seperator.TargetNextGroup();
             }
         }
 
@@ -55,7 +69,7 @@ namespace GodUnityPlugin
             if (!CheckGridPoint(seperator, hits, out point))
                 return false;
 
-            return seperator.grid.IsInGrid(point, out cell, false);
+            return seperator.grid.IsInAnyGrid(point, out cell);
         }
 
         private bool CheckGridPoint(GridSeperator seperator, RaycastHit[] hits, out Vector3 point)

@@ -5,12 +5,27 @@ namespace GodUnityPlugin
 {
     public class GUPGrid : MonoBehaviour
     {
+        [System.Serializable]
+        public struct GroupData
+        {
+            public string groupName;
+            public Color editorColor;
+            public List<int> indices;
+
+            public void SetIndices(List<int> indices)
+            {
+                this.indices = indices;
+            }
+        }
+
         [Header("Grid")]
         // universal grid scale
         [SerializeField] private float scale = 1f;
         // count of the grid array
         [SerializeField] private int row = 5;
         [SerializeField] private int column = 5;
+        [SerializeField] private string defaultGroupName;
+        [SerializeField] private List<GroupData> groupDatas;
 
         [Space(10)]
         [Header("GridCell")]
@@ -18,8 +33,6 @@ namespace GodUnityPlugin
         [SerializeField] private float cellWidth = 5f;
         [SerializeField] private float cellHeight = 5f;
         [SerializeField] private string cellName = "Cell";
-        [SerializeField] private IndependentGridCell[] independentGridCells;
-        [SerializeField] private List<int> ignoreCellIndices = new List<int>();
 
         [Space(10)]
         [Header("Gizmos")]
@@ -104,11 +117,6 @@ namespace GodUnityPlugin
 
         private GridCell[][] _cellArray;
 
-        public IndependentGridCell[] GetIndependentGridCells()
-        {
-            return independentGridCells;
-        }
-
         // returns the index that matches the Cell
         public bool TryGet(GridCell cell, out int row, out int column)
         {
@@ -156,17 +164,20 @@ namespace GodUnityPlugin
         }
 
         // returns the cell that matches the ID
-        public bool TryGet(int index,out GridCell cell)
+      /*  public bool TryGet(int index,out GridCell cell)
         {
             cell = new GridCell();
 
             if (index > Count || index < 0)
                 return false;
 
-            foreach (var ignore in ignoreCellIndices)
+            foreach (var seperateGroupData in seperateGroupDatas)
             {
-                if (ignore == index)
-                    return false;
+                foreach (var seperateIndex in seperateGroupData.indices)
+                {
+                    if (seperateIndex == index)
+                        return false;
+                }
             }
 
             for (int i = 0; i < Column; i++)
@@ -183,7 +194,7 @@ namespace GodUnityPlugin
             }
 
             return false;
-        }
+        }*/
 
         public bool TryGet(int row, int column,out GridCell cell)
         {
@@ -196,82 +207,83 @@ namespace GodUnityPlugin
             return true;
         }
 
-        // check if a vector is in grid matrix
-        public bool IsInGrid(Vector3 point,out GridCell cell)
+        /* // check if a vector is in grid matrix
+         public bool IsInGrid(Vector3 point,out GridCell cell)
+         {
+             cell = new GridCell();
+
+             for (int i = 0; i < Column; i++)
+             {
+                 for (int j = 0; j < Row; j++)
+                 {
+                     GridCell current = CellArray[i][j];
+
+                     foreach (var seperateGroupData in seperateGroupDatas)
+                     {
+                         foreach (var seperateIndex in seperateGroupData.indices)
+                         {
+                             if (seperateIndex == current.index)
+                                 return false;
+                         }
+                     }
+
+                     if (current.IsInCell(point))
+                     {
+                         cell = current;
+
+                         return true;
+                     }
+                 }
+             }
+
+             if (independentGridCells != null )
+                 foreach (var independentCell in independentGridCells)
+                 {
+                     if (independentCell.IsInCell(point))
+                     {
+                         cell = independentCell.GetCell();
+                         return true;
+                     }
+                 }
+
+             return false;
+         }
+ */
+        public bool IsInAnyGrid(Vector3 point, out GridCell cell)
         {
             cell = new GridCell();
 
-            for (int i = 0; i < Column; i++)
-            {
-                for (int j = 0; j < Row; j++)
-                {
-                    GridCell current = CellArray[i][j];
+            Vector3 a = vertices[0];
+            Vector3 b = vertices[1];
+            Vector3 c = vertices[2];
 
-                    foreach (var ignore in ignoreCellIndices)
-                    {
-                        if (ignore == current.index)
-                            return false;
-                    }
+            if (!GUPMath.IsVertexInRectangle(a, b, c, vertices[3], point))
+                return false;
 
-                    if (current.IsInCell(point))
-                    {
-                        cell = current;
+            Vector3 projectAB = Vector3.Project(point - a, b - a);
+            Vector3 projectAC = Vector3.Project(point - a, c - a);
 
-                        return true;
-                    }
-                }
-            }
+            float rowMag = projectAB.magnitude;
+            float colMag = projectAC.magnitude;
 
-            if (independentGridCells != null )
-                foreach (var independentCell in independentGridCells)
-                {
-                    if (independentCell.IsInCell(point))
-                    {
-                        cell = independentCell.GetCell();
-                        return true;
-                    }
-                }
+            int row = (int)(rowMag / CellWidth);
+            int col = (int)(colMag / CellHeight);
 
-            return false;
+            return TryGet(row, col, out cell);
         }
 
-        public bool IsInGrid(Vector3 point, out GridCell cell,bool calculateIgnore = true)
+        // check if a vector is in grid matrix
+        public bool IsInGrid(Vector3 point, out GridCell cell)
         {
-            cell = new GridCell();
+            return IsInGrid(point, defaultGroupName,out cell);
+        }
 
-            for (int i = 0; i < Column; i++)
-            {
-                for (int j = 0; j < Row; j++)
-                {
-                    GridCell current = CellArray[i][j];
+        public bool IsInGrid(Vector3 point, string groupID, out GridCell cell)
+        {
+            if (!IsInAnyGrid(point,out cell))
+                return false;
 
-                    if(calculateIgnore)
-                    foreach (var ignore in ignoreCellIndices)
-                    {
-                        if (ignore == current.index)
-                            return false;
-                    }
-
-                    if (current.IsInCell(point))
-                    {
-                        cell = current;
-
-                        return true;
-                    }
-                }
-            }
-
-            if (independentGridCells != null)
-                foreach (var independentCell in independentGridCells)
-                {
-                    if (independentCell.IsInCell(point))
-                    {
-                        cell = independentCell.GetCell();
-                        return true;
-                    }
-                }
-
-            return false;
+            return cell.groupID == groupID;
         }
 
         // recalculate cell matrix data
@@ -291,7 +303,7 @@ namespace GodUnityPlugin
 
                     string name = cellName + " " + index;
 
-                    CellArray[i][j] = new GridCell(name, cellCenter,normal,GetCellVertices(i,j, CellWidth,CellHeight),quaternionEuler, CellWidth, CellHeight,index , j, i);
+                    CellArray[i][j] = new GridCell(name,defaultGroupName ,cellCenter,normal,GetCellVertices(i,j, CellWidth,CellHeight),quaternionEuler, CellWidth, CellHeight,index , j, i);
                 }
             }
         }
@@ -308,36 +320,76 @@ namespace GodUnityPlugin
             x.normal == y.normal;
         }
 
-        public void SetIgnoreCellIndices(List<int> indices)
+        public void SetGroupDatas(List<GroupData> groupDatas)
         {
-            ignoreCellIndices = indices;   
+            this.groupDatas = groupDatas;
+
+            foreach (var group in groupDatas)
+                foreach (var index in group.indices)
+                    SetGroupNameOfCell(index, group.groupName);
         }
 
-        public void AddIgnoreCellIndices(int index)
+        public void AddSeperateIndex(string groupID,int index)
         {
-            if (ignoreCellIndices == null)
-            {
-                ignoreCellIndices = new List<int>();
-                ignoreCellIndices.Add(index);
-                return;
-            }
+            if(groupDatas != null)
+                foreach (var group in groupDatas)
+                {
+                    if (group.groupName == groupID)
+                    {
+                        if (group.indices == null)
+                            group.SetIndices(new List<int>());
+                        else
+                        {
+                            foreach (var seperateIndex in group.indices)
+                            {
+                                if (seperateIndex == index)
+                                    return;
+                            }
+                        }
+                        group.indices.Add(index);
 
-            if (!ignoreCellIndices.Contains(index))
-                ignoreCellIndices.Add(index);
+                        SetGroupNameOfCell(index,group.groupName);
+
+                        return;
+                    }
+                    else
+                    {
+                        if (group.indices.Contains(index))
+                            group.indices.Remove(index);
+                    }
+                }
         }
 
-        public void RemoveIgnoreCellIndices(int index)
+        public void RemoveIgnoreCellIndices(string id, int index)
         {
-            if (ignoreCellIndices == null)
-                return;
+            if (groupDatas != null)
+                foreach (var group in groupDatas)
+                {
+                    if (group.groupName == id)
+                    {
+                        if (group.indices == null)
+                            return;
+                        else
+                        {
+                            foreach (var seperateIndex in group.indices)
+                            {
+                                if (seperateIndex == index)
+                                {
+                                    group.indices.Remove(index);
 
-            if (ignoreCellIndices.Contains(index))
-                ignoreCellIndices.Remove(index);
+                                    SetGroupNameOfCell(index, null);
+
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
         }
 
-        public List<int> GetIgnoreCellIndices()
+        public List<GroupData> GetGroups()
         {
-            return ignoreCellIndices;
+            return groupDatas;
         }
 
         private void Awake()
@@ -444,6 +496,14 @@ namespace GodUnityPlugin
                 _cellArray[i] = new GridCell[Row];
         }
 
+        private void SetGroupNameOfCell(int index, string groupName)
+        {
+            int column = (int)(index / Column);
+            int row = index - (column * Column);
+
+            CellArray[column][row].groupID = groupName;
+        }
+
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
@@ -505,7 +565,10 @@ namespace GodUnityPlugin
 
             if (drawVertex)
                 for (int i = 0; i < vertices.Length; i++)
+                {
                     Gizmos.DrawSphere(vertices[i], range * 0.1f);
+                    UnityEditor.Handles.Label(vertices[i], "vertex " + i);
+                }
 
             if (CellArray == null || CellArray.Length == 0)
                 return;
@@ -513,22 +576,22 @@ namespace GodUnityPlugin
             for (int i = 0; i < CellArray.Length; i++)
                 for (int j = 0; j < CellArray[i].Length; j++)
                 {
-                    bool ignore = false;
-                    GridCell cell = CellArray[i][j];
+                    GridCell cell = CellArray[j][i];
 
-                    foreach (var index in ignoreCellIndices)
+                    if (string.IsNullOrEmpty(cell.groupID))
                     {
-                        if (index == cell.index)
-                        {
-                            ignore = true;
-                            break;
-                        }
+                        Gizmos.color = Color.Lerp(Color.white, gizmoLineColor, 0.2f);
                     }
-
-                    if (ignore)
-                        Gizmos.color = Color.Lerp(Color.red, gizmoLineColor, 0.2f);
                     else
-                        Gizmos.color = Color.Lerp(Color.blue, gizmoLineColor, 0.2f);
+                    {
+                        if (groupDatas != null)
+                            foreach (var group in groupDatas)
+                            {
+                                if (cell.groupID == group.groupName)
+                                    Gizmos.color = Color.Lerp(group.editorColor, gizmoLineColor, 0.2f);
+                            }
+
+                    }
 
                     if (drawCellLines)
                     {

@@ -10,42 +10,77 @@ namespace GodUnityPlugin
         public GUPGrid grid;
         public BoxCollider boxCollider;
 
-        public IgnoreIndices ignoreIndices;
+        public GridSeperateData seperateGridData;
+
+        private int currentIndex = 0;
 
         private void Awake()
         {
-            if (ignoreIndices != null)
-                grid.SetIgnoreCellIndices(ignoreIndices.GetIndices());
+            SetData();
         }
 
         private void Reset()
         {
-            if (ignoreIndices != null)
-                grid.SetIgnoreCellIndices(ignoreIndices.GetIndices());
+            SetData();
         }
 
         private void OnValidate()
         {
-            if (ignoreIndices != null)
-                grid.SetIgnoreCellIndices(ignoreIndices.GetIndices());
+            SetData();
         }
 
-        public void AddIgnoreCellIndices(int index)
+        public string GetCurrentGroupName()
         {
-            if (ignoreIndices == null)
-                return;
+            List<GUPGrid.GroupData> groupDatas = seperateGridData.GetGroupDatas();
 
-            grid.AddIgnoreCellIndices(index);
-            ignoreIndices.SetIndices(grid.GetIgnoreCellIndices());
+            if (groupDatas == null || groupDatas.Count <= currentIndex || currentIndex < 0)
+                return null;
+
+            return groupDatas[currentIndex].groupName;
         }
 
-        public void RemoveIgnoreCellIndices(int index)
+        public void TargetNextGroup()
         {
-            if (ignoreIndices == null)
+            currentIndex++;
+
+            List<GUPGrid.GroupData> groupDatas = seperateGridData.GetGroupDatas();
+
+            if (groupDatas == null || groupDatas.Count <= 0)
+            {
+                Debug.Log("no group data found");
+                return;
+            }
+
+            if (groupDatas.Count <= currentIndex || currentIndex < 0)
+                currentIndex = 0;
+
+            Debug.Log("editor target group : " + groupDatas[currentIndex].groupName);
+        }
+
+        public void AddIgnoreCellIndices(string id, int index)
+        {
+            if (seperateGridData == null)
                 return;
 
-            grid.RemoveIgnoreCellIndices(index);
-            ignoreIndices.SetIndices(grid.GetIgnoreCellIndices());
+            grid.AddSeperateIndex(id, index);
+            seperateGridData.SaveGroups(grid.GetGroups());
+        }
+
+        public void RemoveIgnoreCellIndices(string id, int index)
+        {
+            if (seperateGridData == null)
+                return;
+
+            grid.RemoveIgnoreCellIndices(id, index);
+            seperateGridData.SaveGroups(grid.GetGroups());
+        }
+
+        private void SetData()
+        {
+            if (seperateGridData != null)
+            {
+                grid.SetGroupDatas(seperateGridData.GetGroupDatas());
+            }
         }
     }
 }

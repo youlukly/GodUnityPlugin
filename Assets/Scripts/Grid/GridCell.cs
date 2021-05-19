@@ -6,6 +6,7 @@ namespace GodUnityPlugin
     public struct GridCell
     {
         public string id;
+        public string groupID;
         public Vector3 center;
         public Vector3 normal;
         public Vector3[] vertices;
@@ -14,9 +15,10 @@ namespace GodUnityPlugin
         public int index;
         public int rowIndex, columnIndex;
 
-        public GridCell(string id, Vector3 center,Vector3 normal,Vector3[] vertices,Quaternion euler,float width, float height,int index,int rowIndex, int columnIndex)
+        public GridCell(string id, string groupID,Vector3 center,Vector3 normal,Vector3[] vertices,Quaternion euler,float width, float height,int index,int rowIndex, int columnIndex)
         {
             this.id = id;
+            this.groupID = groupID;
             this.center = center;
             this.normal = normal;
             this.vertices = vertices;
