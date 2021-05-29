@@ -29,7 +29,7 @@ namespace GodUnityPlugin.Examples
 
         private void OnDrag(Vector3 point)
         {
-            Vector3 heightBuffer = grid.normal * buffer;
+            Vector3 heightBuffer = grid.GetNormal() * buffer;
 
             transform.position = point + heightBuffer;
         }

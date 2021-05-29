@@ -37,7 +37,7 @@ namespace GodUnityPlugin
 
         public void SynchronizeCollider()
         {
-            Bounds bounds = new Bounds(grid.Center, new Vector2(grid.Width, grid.Height));
+            Bounds bounds = new Bounds(grid.transform.position, new Vector2(grid.GetGridWidth(), grid.GetGridHeight()));
 
             boxCollider.size = bounds.size;
             boxCollider.isTrigger = true;
@@ -173,11 +173,6 @@ namespace GodUnityPlugin
             return false;
         }
 
-        private void OnSelect(GridCell cell)
-        {
-            Debug.Log("select cell : name [" + cell.id + "], matrix [" + cell.columnIndex + "], [" + cell.rowIndex + "]");
-        }
-
         private bool IsInFrustum(Camera camera,Vector3 position)
         {
             var planes = GeometryUtility.CalculateFrustumPlanes(camera);
@@ -242,12 +237,14 @@ namespace GodUnityPlugin
 
         private Vector3[] GetGizmoVertices(Vector3 point)
         {
-            Vector3 a = grid.vertices[0];
-            Vector3 b = grid.vertices[1];
-            Vector3 c = grid.vertices[2];
-            Vector3 d = grid.vertices[3];
+            Vector3[] gridVerts = grid.GetVertices();
 
-            float mag = Mathf.Clamp(grid.CellWidth / 5f, grid.CellWidth / 5f, grid.CellHeight / 5f);
+            Vector3 a = gridVerts[0];
+            Vector3 b = gridVerts[1];
+            Vector3 c = gridVerts[2];
+            Vector3 d = gridVerts[3];
+
+            float mag = Mathf.Clamp(grid.cellWidth * 0.2f, grid.cellWidth * 0.2f, grid.cellHeight * 0.2f);
 
             Vector3 dir1 = (a - d).normalized * mag;
             Vector3 dir2 = (b - c).normalized * mag;

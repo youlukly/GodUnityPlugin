@@ -386,7 +386,19 @@ namespace GodUnityPlugin
 
         public static bool IsVertexInRectangle(Vector3 a, Vector3 b, Vector3 c, Vector3 d,Vector3 point)
         {
-            return IsVertexInTriangle(a, b, c, point) || IsVertexInTriangle(d, c, b, point);
+            Vector3 ab = b - a;
+            Vector3 ac = c - a;
+            Vector3 ap = point - a;
+
+            float dotABAP = Vector3.Dot(ab, ap);
+            float abMag = ab.sqrMagnitude;
+            float dotACAP = Vector3.Dot(ac, ap);
+            float acMag = ac.sqrMagnitude;
+
+            if (dotABAP < 0 || dotABAP > abMag || dotACAP < 0 || dotACAP > acMag)
+                return false;
+
+            return true;
         }
 
         public static bool IsVertexInTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 point)

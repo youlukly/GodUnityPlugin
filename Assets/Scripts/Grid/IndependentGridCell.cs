@@ -56,11 +56,9 @@ namespace GodUnityPlugin
 
             Quaternion euler = Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z);
 
-            cell.id = id;
             cell.center = transform.position;
             cell.normal = GetNormal();
             cell.vertices = GetVertices();
-            cell.eulerAngle = euler;
             cell.width = width;
             cell.height = height;
             cell.rowIndex = -1;
@@ -124,7 +122,7 @@ namespace GodUnityPlugin
             Gizmos.DrawLine(cell.vertices[0], cell.vertices[3]);
             Gizmos.DrawLine(cell.vertices[1], cell.vertices[2]);
             Gizmos.DrawRay(cell.center, cell.normal);
-            UnityEditor.Handles.Label(cell.center, cell.id);
+            UnityEditor.Handles.Label(cell.center, cell.index.ToString());
         }
 #endif
     }
