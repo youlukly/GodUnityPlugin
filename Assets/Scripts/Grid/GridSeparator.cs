@@ -55,7 +55,10 @@ namespace GodUnityPlugin
 
             grid.SeparateCell(id, index);
             separateGridData.SaveGroups(grid.GetGroups());
+
+#if UNITY_EDITOR
             EditorUtility.SetDirty(separateGridData);
+#endif
         }
 
         public void TryReconnectCell(string id, int index)
