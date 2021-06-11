@@ -251,6 +251,16 @@ namespace GodUnityPlugin
             return dot >= degDot;
         }
 
+        public static bool IsInAngle(Vector3 origin, Vector3 point, float angle, Vector3 direction)
+        {
+            Vector3 dir = direction.normalized;
+
+            float dot = Vector3.Dot(dir, (point - origin).normalized);
+            float degDot = Vector3.Dot(dir, Quaternion.Euler(0, 0, angle / 2f) * dir);
+
+            return dot >= degDot;
+        }
+
         public static bool IsInRange(Vector2 origin, Vector2 point, float range)
         {
             return (point - origin).sqrMagnitude <= (range * range);
