@@ -430,13 +430,12 @@ namespace GodUnityPlugin
             return Vector3.Dot(crossA, crossB) >= 0;
         }
 
-        public static List<Vector3> FindContactPointInCircle(float slope, float yIntercept, float radius,
-            Vector3 circleCenter)
+        public static List<Vector3> FindContactPointInCircle(float slope, float yIntercept, float radius,Vector3 circleCenter)
         {
             List<Vector3> results = null;
             float a, b;
             float sqrRange;
-            sqrRange = Mathf.Pow(radius, 2);
+            sqrRange = radius * radius;
             a = circleCenter.x;
             b = circleCenter.z;
 
@@ -444,21 +443,20 @@ namespace GodUnityPlugin
             float xCoefficient = 2 * (-a + slope - b * slope);
             float constant = a * a + yIntercept * yIntercept - 2 * yIntercept * b + b * b - sqrRange;
 
-            int D = 0;
-            D = Discriminant(
+            int discriminant = Discriminant(
                 xSqrCoefficient,
                 xCoefficient,
                 constant
             );
 
-            if (D == 2)
+            if (discriminant == 2)
             {
                 float x1, x2, y1, y2;
 
-                x1 = (-1 * xCoefficient + Mathf.Sqrt(xCoefficient * xCoefficient - 4 * xSqrCoefficient * constant)) / 2 *
+                x1 = (-1 * xCoefficient + Mathf.Sqrt(xCoefficient * xCoefficient - 4 * xSqrCoefficient * constant)) * 0.5f *
                      xSqrCoefficient;
                 y1 = slope * x1 + yIntercept;
-                x2 = (-1 * xCoefficient - Mathf.Sqrt(xCoefficient * xCoefficient - 4 * xSqrCoefficient * constant)) / 2 *
+                x2 = (-1 * xCoefficient - Mathf.Sqrt(xCoefficient * xCoefficient - 4 * xSqrCoefficient * constant)) * 0.5f *
                      xSqrCoefficient;
                 y2 = slope * x1 + yIntercept;
 
@@ -467,7 +465,7 @@ namespace GodUnityPlugin
                 result = new Vector3(x2, 0, y2);
                 results.Add(result);
             }
-            else if (D == 1)
+            else if (discriminant == 1)
             {
                 float x, y;
                 x = (-1 * xCoefficient + Mathf.Sqrt(xCoefficient * xCoefficient - 4 * xSqrCoefficient * constant)) / 2 *
@@ -476,10 +474,6 @@ namespace GodUnityPlugin
 
                 Vector3 result = new Vector3(x, 0, y);
                 results.Add(result);
-            }
-            else if (D == 0)
-            {
-                Debug.Log("there is no contact point");
             }
 
             return results;
@@ -636,7 +630,7 @@ namespace GodUnityPlugin
         public static int Discriminant(float xSqrCoefficient, float xCoefficient, float constant)
         {
             float result;
-            result = Mathf.Pow(xCoefficient, 2) - 4 * xSqrCoefficient * constant;
+            result = (xCoefficient * xCoefficient) - (4 * xSqrCoefficient * constant);
             if (result > 0.0f)
                 return 2;
             else if (result == 0.0f)
