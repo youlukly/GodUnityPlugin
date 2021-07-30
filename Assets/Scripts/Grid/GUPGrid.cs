@@ -479,7 +479,7 @@ namespace GodUnityPlugin
             for (int i = 0; i < cellArray.Length; i++)
                 for (int j = 0; j < cellArray[i].Length; j++)
                 {
-                    GridCell cell = cellArray[j][i];
+                    GridCell cell = cellArray[i][j];
 
                     if (string.IsNullOrEmpty(cell.groupID) || cell.groupID == defaultGroupName)
                     {
