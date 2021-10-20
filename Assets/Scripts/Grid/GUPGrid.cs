@@ -96,8 +96,8 @@ namespace GodUnityPlugin
 
         public bool TryGet(int index, out GridCell cell)
         {
-            int column = (int)(index / this.column);
-            int row = index - (column * this.column);
+            int column = (int)(index / this.row);
+            int row = index - (column * this.row);
 
             return TryGet(row,column,out cell);
         }
