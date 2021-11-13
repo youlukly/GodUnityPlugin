@@ -76,8 +76,26 @@ namespace GodUnityPlugin
 
                     //name index suffix
                     int index = i * row + j;
+                    string groupName = defaultGroupName;
 
-                    cellArray[i][j] = new GridCell(defaultGroupName, cellCenter, GetNormal(), GetCellVertices(i, j, cellWidth, cellHeight), cellWidth, cellHeight, index, j, i);
+                    foreach (var groupData in groupDatas)
+                    {
+                        bool isInGroup = false;
+                        foreach (var groupIndex in groupData.indices)
+                        {
+                            if (groupIndex == index)
+                            {
+                                isInGroup = true;
+                                groupName = groupData.groupName;
+                                break;
+                            }
+                        }
+
+                        if (isInGroup)
+                            break;
+                    }
+
+                    cellArray[i][j] = new GridCell(groupName, cellCenter, GetNormal(), GetCellVertices(i, j, cellWidth, cellHeight), cellWidth, cellHeight, index, j, i);
                 }
             }
         }
