@@ -6,27 +6,10 @@ namespace GodUnityPlugin
 {
     public abstract class StatusEffect
     {
-        public abstract string id { get; }
+        public abstract void OnStartEffect();
 
-        public void StartEffect()
-        {
-            OnStartEffect();
-        }
+        public abstract void OnUpdateEffect(out bool isRequireFinish);
 
-        public void UpdateEffect()
-        {
-            OnUpdateEffect();
-        }
-
-        public void FinishEffect()
-        {
-            OnFinishEffect();
-        }
-
-        protected abstract void OnStartEffect();
-
-        protected abstract void OnUpdateEffect();
-
-        protected abstract void OnFinishEffect();
+        public abstract void OnFinishEffect();
     }
 }

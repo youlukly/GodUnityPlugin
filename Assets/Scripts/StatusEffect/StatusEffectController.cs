@@ -6,112 +6,53 @@ namespace GodUnityPlugin
 {
     public class StatusEffectController
     {
-        public StatusEffectUnityEvent onStartEffect = new StatusEffectUnityEvent();
-        public StatusEffectUnityEvent onUpdateEffect = new StatusEffectUnityEvent();
-        public StatusEffectUnityEvent onFinishEffect = new StatusEffectUnityEvent();
-
-        public float updateSpeedMult { get; set; } = 1.0f;
-
-        protected StatusEffect[] effects;
         protected List<StatusEffect> currentEffects = new List<StatusEffect>();
-        protected Dictionary<string, float> remainTimePairs = new Dictionary<string, float>();
 
-        public StatusEffectController(params StatusEffect[] effects)
+        int index;
+        bool requireFinish;
+        public StatusEffectController()
         {
-            this.effects = effects;
         }
 
         public void ManualUpdate()
         {
-            for (int i = 0; i < currentEffects.Count; i++)
+            index = 0;
+            while (index < currentEffects.Count)
             {
-                StatusEffect effect = currentEffects[i];
+                StatusEffect effect = currentEffects[index];
 
-                effect.UpdateEffect();
-                if (onUpdateEffect != null)
-                    onUpdateEffect.Invoke(effect);
+                effect.OnUpdateEffect(out requireFinish);
 
-                if (remainTimePairs.ContainsKey(effect.id))
-                {
-                    remainTimePairs[effect.id] -= Time.deltaTime * updateSpeedMult;
-
-                    if (remainTimePairs[effect.id] <= 0.0f)
-                        RemoveEffect(effect.id);
-                }
+                if (requireFinish)
+                    FinishEffect(effect);
+                else
+                    index++;
             }
         }
-
-        public void AddEffect(string id)
+        public void StartEffect(StatusEffect statusEffect)
         {
-            if (!Contains(id))
+            if (currentEffects.Contains(statusEffect))
                 return;
 
-            StatusEffect effect = Get(id);
+            currentEffects.Add(statusEffect);
+            statusEffect.OnStartEffect(); 
+        }
+        public void FinishEffect(StatusEffect statusEffect)
+        {
+            if (!currentEffects.Contains(statusEffect))
+                return;
 
-            currentEffects.Add(effect);
-            effect.StartEffect();
-            if (onStartEffect != null)
-                onStartEffect.Invoke(effect);
+            statusEffect.OnFinishEffect();
+
+            ClearEffect(statusEffect);
         }
 
-        public void AddEffect(string id, float duration)
-        {
-            if (!Contains(id))
-                return;
-
-            AddEffect(id);
-
-            StatusEffect effect = Get(id);
-
-            if (!remainTimePairs.ContainsKey(effect.id))
-                remainTimePairs.Add(effect.id, duration);
-            else
-                remainTimePairs[effect.id] = duration;
-        }
-
-        public void SetDuration(string id, float duration)
-        {
-            if (!IsEffectedBy(id))
-                return;
-
-            if (!remainTimePairs.ContainsKey(id))
-                return;
-
-            remainTimePairs[id] = duration;
-        }
-
-        public void AddDuration(string id, float duration)
-        {
-            if (!IsEffectedBy(id))
-                return;
-
-            if (!remainTimePairs.ContainsKey(id))
-                return;
-
-            remainTimePairs[id] += duration;
-        }
-
-        public void RemoveEffect(string id)
-        {
-            if (!IsEffectedBy(id))
-                return;
-
-            StatusEffect effect = GetCurrent(id);
-
-            effect.FinishEffect();
-            if (onFinishEffect != null)
-                onFinishEffect.Invoke(effect);
-            ClearEffect(id);
-        }
-
-        public void RemoveAllEffects()
+        public void FinishAllEffects()
         {
             for (int i = 0; i < currentEffects.Count; i++)
             {
                 StatusEffect effect = currentEffects[i];
-                effect.FinishEffect();
-                if (onFinishEffect != null)
-                    onFinishEffect.Invoke(effect);
+                effect.OnFinishEffect();
             }
 
             ClearAllEffects();
@@ -120,70 +61,11 @@ namespace GodUnityPlugin
         public void ClearAllEffects()
         {
             currentEffects.Clear();
-            remainTimePairs.Clear();
         }
-
-        public bool IsEffectedBy(string id)
+        private void ClearEffect(StatusEffect statusEffect)
         {
-            foreach (var statusEffect in currentEffects)
-            {
-                if (statusEffect.id == id)
-                    return true;
-            }
-
-            return false;
-        }
-
-        public StatusEffect GetCurrent(string id)
-        {
-            foreach (var statusEffect in currentEffects)
-            {
-                if (statusEffect.id == id)
-                    return statusEffect;
-            }
-
-            return null;
-        }
-
-        public float GetDuration(string id)
-        {
-            if (!IsEffectedBy(id) || !remainTimePairs.ContainsKey(id))
-                return 0f;
-
-            return remainTimePairs[id];
-        }
-        
-        private StatusEffect Get(string id)
-        {
-            foreach (var statusEffect in effects)
-            {
-                if (statusEffect.id == id)
-                    return statusEffect;
-            }
-
-            return null;
-        }
-
-        private void ClearEffect(string id)
-        {
-            if (!IsEffectedBy(id))
-                return;
-
-            if (remainTimePairs.ContainsKey(id))
-                remainTimePairs.Remove(id);
-
-            currentEffects.Remove(GetCurrent(id));
-        }
-
-        private bool Contains(string id)
-        {
-            foreach (var statusEffect in effects)
-            {
-                if (statusEffect.id == id)
-                    return true;
-            }
-
-            return false;
+            if (currentEffects.Contains(statusEffect))
+                currentEffects.Remove(statusEffect);
         }
     }
 }
