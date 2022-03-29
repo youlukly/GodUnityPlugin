@@ -20,8 +20,8 @@ namespace GodUnityPlugin
 
         [Header("Grid")]
         // count of the grid array
-        public int row = 5;
-        public int column = 5;
+        public int horizon = 5;
+        public int vertical = 5;
         [SerializeField] private string defaultGroupName;
         [SerializeField] private GroupData[] groupDatas;
 
@@ -46,17 +46,17 @@ namespace GodUnityPlugin
         private Vector3[] vertices;
 
         // total width of the grid
-        public float GetGridWidth() { return cellWidth * row; }
+        public float GetGridWidth() { return cellWidth * horizon; }
 
         // total height of the grid
-        public float GetGridHeight() { return cellHeight * column; }
+        public float GetGridHeight() { return cellHeight * vertical; }
 
         // euler quaternion of grid gameObject
         public Quaternion GetQuaternionEuler() {return Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, transform.eulerAngles.z); }
 
         public int GetCellCount()
         {
-            return row * column;
+            return horizon * vertical;
         }
 
         // recalculate cell matrix data
@@ -67,15 +67,15 @@ namespace GodUnityPlugin
 
             InitializeArray();
 
-            for (int i = 0; i < column; i++)
+            for (int i = 0; i < vertical; i++)
             {
-                for (int j = 0; j < row; j++)
+                for (int j = 0; j < horizon; j++)
                 {
                     //calibrate by rotation
                     Vector3 cellCenter = GetCellCenter(i, j);
 
                     //name index suffix
-                    int index = i * row + j;
+                    int index = (i * vertical) + j;
                     string groupName = defaultGroupName;
 
                     foreach (var groupData in groupDatas)
@@ -114,20 +114,20 @@ namespace GodUnityPlugin
 
         public bool TryGet(int index, out GridCell cell)
         {
-            int column = (int)(index / this.row);
-            int row = index - (column * this.row);
+            int vertical = (int)(index / this.horizon);
+            int horizon = index - (vertical * this.horizon);
 
-            return TryGet(row,column,out cell);
+            return TryGet(vertical,horizon,out cell);
         }
 
-        public bool TryGet(int row, int column,out GridCell cell)
+        public bool TryGet(int vertical, int horizon, out GridCell cell)
         {
             cell = new GridCell();
 
-            if (row < 0 || column < 0 || column > cellArray.Length-1 || row > cellArray[0].Length-1)
+            if (horizon < 0 || vertical < 0 || vertical > cellArray.Length-1 || horizon > cellArray[0].Length-1)
                 return false;
 
-            cell = cellArray[column][row];
+            cell = cellArray[vertical][horizon];
             return true;
         }
 
@@ -153,10 +153,10 @@ namespace GodUnityPlugin
             float rowMag = projectAB.magnitude;
             float colMag = projectAC.magnitude;
 
-            int row = (int)(rowMag / cellWidth);
-            int col = (int)(colMag / cellHeight);
+            int horizon = (int)(rowMag / cellWidth);
+            int vertical = (int)(colMag / cellHeight);
 
-            return TryGet(row, col, out cell);
+            return TryGet(vertical, horizon, out cell);
         }
 /*
         public bool IsInAnyGrid(Vector3 point, float height, float width, out GridCell[] cells)
@@ -194,8 +194,8 @@ namespace GodUnityPlugin
         public bool CompareCell(GridCell x, GridCell y)
         {
             return x.center == y.center &&
-            x.columnIndex == y.columnIndex &&
-            x.rowIndex == y.rowIndex &&
+            x.verticalIndex == y.verticalIndex &&
+            x.horizontalIndex == y.horizontalIndex &&
             x.height == y.height &&
             x.width == y.width &&
             x.normal == y.normal;
@@ -280,9 +280,9 @@ namespace GodUnityPlugin
         }
 
         // returns vertices of the cell. always returns 4 values with matrix order
-        private Vector3[] GetCellVertices(int columnIndex,int rowIndex,float width,float height)
+        private Vector3[] GetCellVertices(int verticalIndex,int horizontalIndex, float width,float height)
         {
-            Vector3 cellCenter = GetCellCenterRaw(columnIndex, rowIndex);
+            Vector3 cellCenter = GetCellCenterRaw(verticalIndex, horizontalIndex);
 
             float xMin = cellCenter.x - (width / 2.0f);
             float xMax = cellCenter.x + (width / 2.0f);
@@ -302,7 +302,7 @@ namespace GodUnityPlugin
         }
 
         // uncalibrated center of the cell 
-        private Vector3 GetCellCenterRaw(int columnIndex, int rowIndex)
+        private Vector3 GetCellCenterRaw(int verticalIndex, int horizontalIndex)
         {
             Vector3 defaultCenter = GetCalibratedCenter() + new Vector3(GetMinimalOffsetX(), GetMaximumOffsetY());
 
@@ -310,32 +310,37 @@ namespace GodUnityPlugin
 
             defaultCenter = defaultCenter + buffer;
                 
-            Vector3 cellCenter = defaultCenter + new Vector3(rowIndex * cellWidth, columnIndex * -cellHeight);
+            Vector3 cellCenter = defaultCenter + new Vector3(horizontalIndex * cellWidth, verticalIndex * -cellHeight);
 
             return cellCenter;
         }
 
         // calibrated center of the cell 
-        private Vector3 GetCellCenter(int columnIndex, int rowIndex)
+        private Vector3 GetCellCenter(int verticalIndex, int horizontalIndex)
         {
-            return GetQuaternionEuler() * GetCellCenterRaw(columnIndex,rowIndex);
+            return GetQuaternionEuler() * GetCellCenterRaw(verticalIndex, horizontalIndex);
         }
 
    
         // initialize cell array
         private void InitializeArray()
         {
-            cellArray = new GridCell[column][];
+            cellArray = new GridCell[vertical][];
             for (int i = 0; i < cellArray.Length; i++)
-                cellArray[i] = new GridCell[row];
+                cellArray[i] = new GridCell[horizon];
         }
 
         private void SetGroupNameOfCell(int index, string groupName)
         {
-            int column = (int)(index / this.column);
-            int row = index - (column * this.column);
+            GridCell cell;
 
-            cellArray[column][row].groupID = groupName;
+            if (!TryGet(index, out cell))
+            {
+                Debug.LogError("No cell found... Try update grid");
+                return;
+            }
+
+            cell.groupID = groupName;
         }
 
         // minimal x-axis value of grid
@@ -432,10 +437,9 @@ namespace GodUnityPlugin
 
             Quaternion quaternion = GetQuaternionEuler();
 
-            // draw the horizontal lines
-            for (int x = 0; x < column + 1; x++)
+            for (int x = 0; x < vertical + 1; x++)
             {
-                if (x == 0 || x == column)
+                if (x == 0 || x == vertical)
                     Gizmos.color = gizmoLineColor;
                 else
                     Gizmos.color = Color.Lerp(Color.white, gizmoLineColor, 0.6f);
@@ -452,10 +456,9 @@ namespace GodUnityPlugin
                 Gizmos.DrawLine(pos1, pos2);
             }
 
-            // draw the vertical lines
-            for (int y = 0; y < row + 1; y++)
+            for (int y = 0; y < horizon + 1; y++)
             {
-                if (y == 0 || y == row)
+                if (y == 0 || y == horizon)
                     Gizmos.color = gizmoLineColor;
                 else
                     Gizmos.color = Color.Lerp(Color.white, gizmoLineColor, 0.6f);

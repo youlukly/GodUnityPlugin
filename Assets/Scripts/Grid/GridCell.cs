@@ -11,9 +11,9 @@ namespace GodUnityPlugin
         public Vector3[] vertices;
         public float width,height;
         public int index;
-        public int rowIndex, columnIndex;
+        public int horizontalIndex, verticalIndex;
 
-        public GridCell(string groupID,Vector3 center,Vector3 normal,Vector3[] vertices,float width, float height,int index,int rowIndex, int columnIndex)
+        public GridCell(string groupID,Vector3 center,Vector3 normal,Vector3[] vertices,float width, float height,int index,int horizontalIndex, int verticalIndex)
         {
             this.groupID = groupID;
             this.center = center;
@@ -22,8 +22,8 @@ namespace GodUnityPlugin
             this.width = width;
             this.height = height;
             this.index = index;
-            this.rowIndex = rowIndex;
-            this.columnIndex = columnIndex;
+            this.horizontalIndex = horizontalIndex;
+            this.verticalIndex = verticalIndex;
         }
 
         // check if a vector is in cell

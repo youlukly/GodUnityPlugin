@@ -61,8 +61,8 @@ namespace GodUnityPlugin
             cell.vertices = GetVertices();
             cell.width = width;
             cell.height = height;
-            cell.rowIndex = -1;
-            cell.columnIndex = -1;
+            cell.horizontalIndex = -1;
+            cell.verticalIndex = -1;
         }
 
         // returns vertices of the cell. always returns 4 values with matrix order
