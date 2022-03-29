@@ -78,7 +78,6 @@ namespace GodUnityPlugin
         {
             if (separateGridData != null)
             {
-                grid.UpdateCellMatrix();
                 grid.SetGroupDatas(separateGridData.GetGroupDatas());
             }
         }
