@@ -75,7 +75,7 @@ namespace GodUnityPlugin
                     Vector3 cellCenter = GetCellCenter(i, j);
 
                     //name index suffix
-                    int index = (i * vertical) + j;
+                    int index = (j * vertical) + i;
                     string groupName = defaultGroupName;
 
                     foreach (var groupData in groupDatas)
