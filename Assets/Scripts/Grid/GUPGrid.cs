@@ -24,6 +24,7 @@ namespace GodUnityPlugin
         public int vertical = 5;
         [SerializeField] private string defaultGroupName;
         [SerializeField] private GroupData[] groupDatas;
+        [SerializeField] private GridSeparateData gridSeparateData;
 
         [Space(10)]
         [Header("GridCell")]
@@ -62,6 +63,9 @@ namespace GodUnityPlugin
         // recalculate cell matrix data
         public void UpdateCellMatrix()
         {
+            if (gridSeparateData != null)
+                groupDatas = gridSeparateData.GetGroupDatas();
+
             vertices = CalculateVertices();
             normal = CalculateNormal();
 
