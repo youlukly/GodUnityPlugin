@@ -46,6 +46,9 @@ namespace GodUnityPlugin
 
         public void RemoveAllStackValues(string id)
         {
+            if (!stackValuePairs.ContainsKey(id))
+                return;
+
             stackValuePairs[id].Clear();
         }
 
